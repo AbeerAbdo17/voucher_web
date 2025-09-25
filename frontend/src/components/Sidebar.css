@@ -1,0 +1,80 @@
+.sidebar {
+  height: 100vh;
+  background: #153F4D;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0;
+  transition: width 0.3s ease, transform 0.3s ease;
+  box-shadow: 2px 0 10px rgba(0,0,0,0.2);
+  z-index: 1000;
+  overflow: hidden;
+}
+
+/* الحالة المفتوحة */
+.sidebar.open {
+  width: 220px;
+  transform: translateX(0);
+}
+
+/* الحالة المطوية */
+.sidebar.collapsed {
+  width: 60px;
+}
+
+/* زر الفتح */
+.toggle-btn {
+  display: flex;
+  justify-content: flex-end;
+  padding: 10px;
+  cursor: pointer;
+  color: #77C8BF;
+}
+
+.menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  flex: 1;
+}
+
+.menu li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.menu li:hover {
+  background: #1F5869;
+}
+
+.menu span {
+  font-size: 14px;
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+/* إخفاء النص عند الطي */
+.sidebar.collapsed .menu span {
+  display: none;
+}
+
+.sidebar.collapsed .toggle-btn {
+  justify-content: center;
+}
+
+/* ======== Responsive ======== */
+@media (max-width: 768px) {
+  .sidebar {
+    transform: translateX(-100%);
+    position: fixed;
+  }
+
+  .sidebar.open {
+    transform: translateX(0);
+  }
+}

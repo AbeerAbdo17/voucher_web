@@ -1,0 +1,239 @@
+.voucher-container {
+  max-width: 1000px;
+  width: 95%;
+  margin: 30px auto;
+  background: #fff;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(21, 63, 77, 0.2);
+  font-family: "Cairo", sans-serif;
+  box-sizing: border-box;
+}
+
+/* العنوان */
+h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #153F4D;
+}
+
+/* Header */
+.form-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  align-items: flex-end;
+  margin-bottom: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 120px;
+}
+
+.form-group label {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.form-header input,
+.form-header button {
+  padding: 6px 10px;
+  font-size: 14px;
+  border: 1px solid #C8E2E1;
+  border-radius: 6px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* الجدول */
+.voucher-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  margin-bottom: 15px;
+}
+
+.voucher-table th,
+.voucher-table td {
+  border: 1px solid #C8E2E1;
+  padding: 6px;
+  text-align: left;
+}
+
+.voucher-table th {
+  background: #153F4D;
+  color: #fff;
+  font-weight: bold;
+  text-align: center;
+}
+
+.voucher-table tr:nth-child(even) {
+  background: #f0f6f6;
+}
+
+.voucher-table input {
+  width: 100%;
+  padding: 4px;
+  border: none;
+  outline: none;
+  background: transparent;
+  box-sizing: border-box;
+}
+
+/* الاقتراحات */
+.with-suggestions {
+  position: relative;
+}
+
+.suggestions {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  left: 0;
+  border: 1px solid #C8E2E1;
+  background: #fff;
+  max-height: 150px;
+  overflow-y: auto;
+  z-index: 10;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.suggestions li {
+  padding: 5px;
+  cursor: pointer;
+}
+
+.suggestions li.active,
+.suggestions li:hover {
+  background: #77C8BF;
+  color: #153F4D;
+}
+
+/* التوتالز */
+.totals {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  font-weight: bold;
+  color: #1F5869;
+  margin-bottom: 15px;
+}
+
+/* الأزرار */
+.form-actions {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.btn {
+  padding: 10px 20px;
+  border: none;
+  cursor: pointer;
+  border-radius: 6px;
+  font-family: "Cairo", sans-serif;
+  margin: 5px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+  transition: all 0.3s ease;
+}
+
+.btn.save {
+  background: #153F4D;
+  color: #fff;
+}
+
+.btn.save:hover {
+  background: #1F5869;
+}
+
+.btn.delete {
+  background: #e74c3c;
+  color: #fff;
+}
+
+.btn.delete:hover {
+  background: #b31200;
+}
+.btn.print {
+  background: #568f88;
+  color: white;
+  margin-left: 5px; 
+  transition: all 0.3s ease;
+}
+
+.btn.print:hover {
+  background: #316963;
+  color: white;
+}
+
+
+/* Toast messages */
+.toast {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  padding: 12px 20px;
+  border-radius: 8px;
+  color: #fff;
+  font-weight: bold;
+  z-index: 9999;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+  animation: fadeInOut 3s forwards;
+}
+
+.toast.success {
+  background: #77C8BF;
+  color: #153F4D;
+}
+
+.toast.error {
+  background: #e74c3c;
+}
+
+@keyframes fadeInOut {
+  0% { opacity: 0; transform: translateY(-10px); }
+  10% { opacity: 1; transform: translateY(0); }
+  90% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-10px); }
+}
+
+/* Media Queries */
+
+/* تابليت */
+@media (max-width: 1024px) {
+  .form-header {
+    gap: 10px;
+  }
+  .form-group {
+    min-width: 100px;
+  }
+  .voucher-table th,
+  .voucher-table td {
+    font-size: 13px;
+    padding: 4px;
+  }
+}
+
+/* موبايل */
+@media (max-width: 768px) {
+  .form-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .form-group {
+    width: 100%;
+  }
+  .totals {
+    flex-direction: column;
+    gap: 5px;
+  }
+  .voucher-table th,
+  .voucher-table td {
+    font-size: 12px;
+    padding: 3px;
+  }
+}

@@ -1,0 +1,232 @@
+.account-container {
+  max-width: 1000px;
+  width: 95%;
+  margin: 30px auto;
+  background: #fff;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(21, 63, 77, 0.2);
+  font-family: "Cairo", sans-serif;
+  box-sizing: border-box;
+}
+
+.account-container h2 {
+  text-align: center;
+  color: #153F4D;
+  margin-bottom: 20px;
+}
+
+/* الفورم */
+.account-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-bottom: 25px;
+}
+
+.account-form .form-group {
+  flex: 1 1 200px;
+  display: flex;
+  flex-direction: column;
+}
+
+.account-form label {
+  font-weight: bold;
+  margin-bottom: 8px;
+  font-size: 16px; /* أكبر شوية عشان يتناسب مع الزر */
+}
+.account-form input {
+  padding: 8px 10px;
+  border: 1px solid #C8E2E1;
+  border-radius: 6px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* تعديل شكل select ليكون مثل input */
+.account-form select {
+  padding: 2px 10px;
+  border: 1px solid #C8E2E1;
+  border-radius: 6px;
+  width: 100%;
+  box-sizing: border-box;
+  font-size: 14px;
+   font-family: "Cairo", sans-serif; 
+  background-color: #fff;
+  appearance: none; /* إزالة السهم الافتراضي في بعض المتصفحات */
+  cursor: pointer;
+}
+
+/* إضافة سهم مخصص (اختياري) */
+.account-form select::-ms-expand {
+  display: none; /* لإخفاء السهم في IE */
+}
+
+
+
+/* زر الحفظ */
+.account-form .btn.save {
+  padding: 10px 20px;
+  border: none;
+  cursor: pointer;
+  border-radius: 6px;
+  font-family: "Cairo", sans-serif;
+  margin: 15px 5px 5px 5px; /* زيادة المسافة من الأعلى */
+  box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+  transition: all 0.3s ease;
+  background: #153F4D;
+  color: #fff;
+}
+
+
+.account-form .btn.save:hover {
+  background: #1F5869;
+}
+
+/* Toast */
+.toast {
+  background: #4caf50;
+  color: #fff;
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 6px;
+  text-align: center;
+  animation: fadeInOut 3s forwards;
+}
+
+@keyframes fadeInOut {
+  0% { opacity: 0; transform: translateY(-10px); }
+  10% { opacity: 1; transform: translateY(0); }
+  90% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-10px); }
+}
+
+/* البحث الحي فوق الجدول */
+.account-search {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.account-search input {
+  flex: 1;
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid #C8E2E1;
+}
+
+.account-search button {
+  padding: 8px 12px;  /* أصغر */
+  background: #153F4D;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.3s;
+  font-size: 14px;
+}
+
+.account-search button:hover {
+  background: #1F5869;
+}
+
+/* الجدول */
+.accounts-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+.accounts-table th,
+.accounts-table td {
+    text-align: center;  /* يجعل المحتوى أفقيًا في الوسط */
+  vertical-align: middle;
+  border: 1px solid #C8E2E1;
+  padding: 8px;
+
+}
+
+.accounts-table th {
+  background: #153F4D;
+  color: #fff;
+  font-weight: bold;
+  text-align: center;
+}
+
+.accounts-table tr:nth-child(even) {
+  background: #f0f6f6;
+}
+
+/* أزرار الجدول */
+.accounts-table .btn {
+  padding: 8px 12px;   /* نفس padding زر الفورم */
+  font-size: 14px;     /* نفس حجم النص */
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  margin-right: 4px;
+  height: 40px;        /* نفس ارتفاع زر الفورم */
+  min-width: 80px;     /* حجم ثابت */
+}
+.accounts-table .btn.save {
+  background: #153F4D;
+  color: #fff;
+}
+.accounts-table .btn.save:hover {
+  background: #1F5869;
+}
+.accounts-table .btn.delete {
+  background: #e74c3c;
+  color: #fff;
+}
+.accounts-table .btn.delete:hover {
+  background: #b31200;
+}
+.btn cancel {
+  background: #7f8c8d;
+  color: #fff;
+}
+.btn cancel:hover {
+  background: #636e70;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .account-form {
+    flex-direction: column;
+  }
+  .account-search {
+    flex-direction: column;
+  }
+  .account-search button {
+    width: 100%;
+  }
+}
+.form-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  align-items: flex-end;
+  margin-bottom: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 120px;
+}
+
+.form-group label {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.form-group input {
+  padding: 6px 10px;
+  font-size: 14px;
+  border: 1px solid #C8E2E1;
+  border-radius: 6px;
+  width: 100%;
+  box-sizing: border-box;
+}

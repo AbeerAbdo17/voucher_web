@@ -1,0 +1,115 @@
+.account-container {
+  max-width: 1000px;
+  width: 95%;
+  margin: 30px auto;
+  background: #fff;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(21, 63, 77, 0.2);
+  font-family: "Cairo", sans-serif;
+  box-sizing: border-box;
+}
+
+.account-container h2 {
+  text-align: center;
+  color: #153F4D;
+  margin-bottom: 20px;
+}
+
+.account-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-bottom: 25px;
+}
+
+.form-group {
+  flex: 1 1 200px;
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  font-weight: bold;
+  margin-bottom: 8px;
+  font-size: 16px;
+}
+
+.form-group input,
+.form-group select {
+  padding: 8px 10px;
+  border: 1px solid #C8E2E1;
+  border-radius: 6px;
+  font-family: "Cairo", sans-serif;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.account-form .btn.save,
+.accounts-table .btn.save {
+  padding: 10px 20px;
+  border: none;
+  cursor: pointer;
+  border-radius: 6px;
+  margin: 5px;
+  background: #153F4D;
+  color: #fff;
+}
+
+.account-form .btn.cancel {
+  padding: 10px 20px;
+  border: none;
+  cursor: pointer;
+  border-radius: 6px;
+  margin: 5px;
+  background: #e74c3c;
+  color: #fff;
+}
+
+.accounts-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.accounts-table th,
+.accounts-table td {
+  border: 1px solid #C8E2E1;
+  text-align: center;
+  vertical-align: middle;
+  padding: 8px;
+}
+
+.accounts-table th {
+  background: #153F4D;
+  color: #fff;
+}
+
+.accounts-table tr:nth-child(even) {
+  background: #f0f6f6;
+}
+
+.accounts-table .btn.delete {
+  background: #e74c3c;
+  color: #fff;
+}
+
+.accounts-table .btn.delete:hover {
+  background: #b31200;
+}
+.btn.cancel {
+  background: #acacac;
+  color: #fff;
+}
+.btn.cancel:hover {
+  background: #b31200;
+}
+
+.toast {
+  background: #4caf50;
+  color: #fff;
+  padding: 10px;
+  border-radius: 6px;
+  text-align: center;
+  margin-bottom: 10px;
+}
