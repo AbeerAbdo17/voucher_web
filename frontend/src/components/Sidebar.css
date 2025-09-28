@@ -32,6 +32,7 @@
   color: #77C8BF;
 }
 
+/* القائمة */
 .menu {
   list-style: none;
   padding: 0;
@@ -68,13 +69,44 @@
 }
 
 /* ======== Responsive ======== */
-@media (max-width: 768px) {
+
+/* شاشات تابلت متوسطة */
+@media (max-width: 1024px) {
   .sidebar {
-    transform: translateX(-100%);
-    position: fixed;
+    width: 60px; /* مطوي افتراضياً */
   }
 
   .sidebar.open {
-    transform: translateX(0);
+    width: 220px;
+  }
+
+  .sidebar.collapsed {
+    width: 60px;
   }
 }
+
+/* شاشات الموبايل */
+@media (max-width: 768px) {
+  .sidebar {
+    position: fixed;
+    top: 0;
+    width: 220px;        /* عرض السايدبار الكامل */
+    height: 100vh;
+    transform: translateX(-100%); /* مخفي افتراضياً */
+    transition: transform 0.3s ease;
+  }
+
+  .sidebar.open {
+    transform: translateX(0); /* يظهر كامل */
+  }
+
+  .sidebar.collapsed {
+    transform: translateX(-100%); /* مخفي */
+  }
+
+  .sidebar .toggle-btn {
+    justify-content: flex-start;
+    padding-left: 15px;
+  }
+}
+

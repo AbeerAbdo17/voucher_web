@@ -3,6 +3,7 @@ import VoucherForm from "./components/VoucherForm";
 import Sidebar from "./components/Sidebar";
 import AccountsForm from "./components/AccountsForm";
 import HighAccounts  from "./components/HighAccountsForm";
+import HighBandsForm from "./components/HighBandsForm";
 
 function App() {
   const [lang, setLang] = useState("ar");
@@ -20,6 +21,7 @@ function App() {
     if (path === "/") setPage("voucher");
     if (path === "/accounts") setPage("accounts");
     if (path === "/HighAccounts") setPage("HighAccounts");
+    if (path === "/HighBands") setPage("HighBands");
     // هنا تضيف صفحات تانية
   };
 
@@ -42,6 +44,7 @@ function App() {
         {page === "voucher" && <VoucherForm lang={lang} />}
         {page === "accounts" && <AccountsForm lang={lang} />} 
         {page === "HighAccounts" && <HighAccounts lang={lang} />}
+        {page === "HighBands" && <HighBandsForm lang={lang} />}
         
       </div>
     </div>

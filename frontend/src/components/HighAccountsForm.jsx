@@ -129,13 +129,13 @@ if (editingId) {
 
   return (
     <div className="account-container">
-      <h2>{lang === "ar" ? "الحسابات العليا" : "High Accounts"}</h2>
+      <h2>{lang === "ar" ?  "الحسابات الفرعية" : "High Sub Accounts"}</h2>
 
       <form onSubmit={handleSubmit} className="account-form">
         <div className="form-group">
           <label>{lang === "ar" ? "الحساب الرئيسي" : "Main Account"}</label>
           <select value={mainBandNo} onChange={(e) => setMainBandNo(e.target.value)} required>
-            <option value="">{lang === "ar" ? "اختر الحساب" : "Select High Account"}</option>
+            <option value="">{lang === "ar" ? "  اختر الحساب " : "Select High Account"}</option>
             {highAccounts.map(acc => (
               <option key={acc.ID} value={acc.subb_band_no}>{acc.subbname}</option>
             ))}
@@ -188,21 +188,22 @@ if (editingId) {
           </tr>
         </thead>
         <tbody>
-          {subAccounts.map(acc => (
-            <tr key={acc.ID}>
-              <td>{acc.MAIN_NO}</td>
-              <td>{acc.MAIN_NAME}</td>
-              <td>{acc.high_account_name || ""}</td>
-              <td>
-                <button className="btn save" onClick={() => handleEdit(acc)}>
-                  {lang === "ar" ? "تعديل" : "Edit"}
-                </button>
-                <button className="btn delete" onClick={() => handleDelete(acc.MAIN_NO)}>
-                  {lang === "ar" ? "حذف" : "Delete"}
-                </button>
-              </td>
-            </tr>
-          ))}
+   {subAccounts.map((acc, index) => (
+  <tr key={`${acc.ID}-${acc.MAIN_NO}-${index}`}>
+    <td>{acc.MAIN_NO}</td>
+    <td>{acc.MAIN_NAME}</td>
+    <td>{acc.high_account_name || ""}</td>
+    <td>
+      <button className="btn save" onClick={() => handleEdit(acc)}>
+        {lang === "ar" ? "تعديل" : "Edit"}
+      </button>
+      <button className="btn delete" onClick={() => handleDelete(acc.MAIN_NO)}>
+        {lang === "ar" ? "حذف" : "Delete"}
+      </button>
+    </td>
+  </tr>
+))}
+
         </tbody>
       </table>
     </div>

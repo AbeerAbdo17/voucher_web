@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { FaBars, FaSignOutAlt, FaBook } from "react-icons/fa"; // أيقونات
 import "./Sidebar.css";
-import { FaUsers, FaLayerGroup } from "react-icons/fa";
+import { FaWallet, FaLayerGroup, FaBoxes, FaGlobe } from "react-icons/fa";
 
 
 function Sidebar({ lang, setLang, navigate }) {
@@ -39,17 +39,21 @@ function Sidebar({ lang, setLang, navigate }) {
       {/* القائمة */}
       <ul className="menu">
         <li onClick={toggleLanguage}>
-          🌐 <span>{lang === "ar" ? "English" : "عربي"}</span>
+          <FaGlobe /> <span>{lang === "ar" ? "English" : "عربي"}</span>
         </li>
         <li onClick={() => handleNavigate("/")}>
          <FaBook /> <span>{lang === "ar" ? "قيد اليومية" : "Journal Entry"}</span>
         </li>
         <li onClick={() => handleNavigate("/accounts")}>
-         <FaUsers /> <span>{lang === "ar" ? "الحسابات" : "Accounts"}</span>
+         <FaWallet /> <span>{lang === "ar" ? "الحسابات" : "Accounts"}</span>
         </li> 
         <li onClick={() => handleNavigate("/HighAccounts")}>
-         <FaLayerGroup /> <span>{lang === "ar" ? " الحسابات العليا" : "High Accounts"}</span>
+         <FaLayerGroup /> <span>{lang === "ar" ? "الحسابات الفرعية" : "High Sub Accounts"}</span>
         </li>
+        <li onClick={() => handleNavigate("/HighBands")}>
+         <FaBoxes /> <span>{lang === "ar" ? "الحسابات العليا" : "High Accounts"}</span>
+        </li>
+        {/* تضيف عناصر تانية هنا */}
         <li onClick={handleLogout}>
           <FaSignOutAlt /> <span>{lang === "ar" ? "تسجيل خروج" : "Logout"}</span>
         </li>

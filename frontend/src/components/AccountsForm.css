@@ -182,13 +182,6 @@
 .accounts-table .btn.delete:hover {
   background: #b31200;
 }
-.btn cancel {
-  background: #7f8c8d;
-  color: #fff;
-}
-.btn cancel:hover {
-  background: #636e70;
-}
 
 /* Responsive */
 @media (max-width: 768px) {

@@ -519,5 +519,104 @@ app.delete("/api/sub-accounts/:mainNo", async (req, res) => {
   }
 });
 
+// ---------------- الحسابات الاساسية ----------------
 
-app.listen(5000, () => console.log("Server running on port 5000"));
+// جلب جميع الباندات
+app.get("/api/bands", async (req, res) => {
+  try {
+    const [rows] = await pool.query("SELECT BAND_NO, BAND_NAME FROM band ORDER BY BAND_NO ASC");
+    res.json(rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// جلب الـ Subband (High Accounts) مع بحث
+app.get("/api/high-accounts", async (req, res) => {
+  const { search } = req.query;
+  try {
+    const sql = search
+      ? `SELECT s.ID, s.subbno, s.subbname, s.subb_band_no, b.BAND_NAME as band_name
+         FROM subband s
+         LEFT JOIN band b ON s.subb_band_no = b.BAND_NO
+         WHERE s.subbno LIKE ? OR s.subbname LIKE ? OR b.BAND_NAME LIKE ?
+         ORDER BY s.subbno ASC LIMIT 50`
+      : `SELECT s.ID, s.subbno, s.subbname, s.subb_band_no, b.BAND_NAME as band_name
+         FROM subband s
+         LEFT JOIN band b ON s.subb_band_no = b.BAND_NO
+         ORDER BY s.subbno ASC LIMIT 50`;
+
+    const [rows] = await pool.query(
+      sql,
+      search ? [`%${search}%`, `%${search}%`, `%${search}%`] : []
+    );
+    res.json(rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// إضافة Subband
+app.post("/api/high-accounts", async (req, res) => {
+  const { subbno, subbname, subb_band_no } = req.body;
+  if (!subbno || !subbname || !subb_band_no)
+    return res.status(400).json({ error: "All fields are required" });
+
+  try {
+    const [exist] = await pool.query("SELECT * FROM subband WHERE subbno = ?", [subbno]);
+    if (exist.length > 0) return res.status(400).json({ error: "Subband already exists" });
+
+    const [result] = await pool.query(
+      "INSERT INTO subband (subbno, subbname, subb_band_no) VALUES (?, ?, ?)",
+      [subbno, subbname, subb_band_no]
+    );
+
+    res.json({ message: "Subband created", id: result.insertId });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// تعديل Subband
+app.put("/api/high-accounts/:id", async (req, res) => {
+  const { id } = req.params;
+  const { subbno, subbname, subb_band_no } = req.body;
+
+  if (!subbno || !subbname || !subb_band_no)
+    return res.status(400).json({ error: "All fields are required" });
+
+  try {
+    const [current] = await pool.query("SELECT * FROM subband WHERE ID = ?", [id]);
+    if (current.length === 0) return res.status(404).json({ error: "Subband not found" });
+
+    if (current[0].subbno !== subbno) {
+      const [exist] = await pool.query("SELECT * FROM subband WHERE subbno = ?", [subbno]);
+      if (exist.length > 0) return res.status(400).json({ error: "Subband No already exists" });
+    }
+
+    const [result] = await pool.query(
+      "UPDATE subband SET subbno = ?, subbname = ?, subb_band_no = ? WHERE ID = ?",
+      [subbno, subbname, subb_band_no, id]
+    );
+
+    res.json({ message: "Subband updated successfully" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// حذف Subband
+app.delete("/api/high-accounts/:subbno", async (req, res) => {
+  const subbno = req.params.subbno;
+  try {
+    const [result] = await pool.query("DELETE FROM subband WHERE subbno = ?", [subbno]);
+    if (result.affectedRows === 0) return res.status(404).json({ error: "Subband not found" });
+    res.json({ message: "Subband deleted" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
+app.listen(5000, "0.0.0.0", () => console.log("Server running on port 5000"));
+

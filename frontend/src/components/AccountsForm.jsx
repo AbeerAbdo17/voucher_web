@@ -6,17 +6,17 @@ function AccountsForm({ lang }) {
   const [accNo, setAccNo] = useState("");
   const [accName, setAccName] = useState("");
   const [mainNo, setMainNo] = useState("");
-  const [message, setMessage] = useState("");
   const [accounts, setAccounts] = useState([]);
   const [mainAccounts, setMainAccounts] = useState([]);
   const [search, setSearch] = useState("");
-  const [editing, setEditing] = useState(null);
+  const [editingId, setEditingId] = useState(null);
+  const [message, setMessage] = useState("");
 
   // جلب الحسابات الفرعية
-  const fetchAccounts = async (query = "") => {
+  const fetchAccounts = async () => {
     try {
       const res = await axios.get(
-        `http://localhost:5000/api/accounts/all?search=${query}`
+        `http://localhost:5000/api/accounts/all?search=${search}`
       );
       setAccounts(res.data);
     } catch (err) {
@@ -35,44 +35,77 @@ function AccountsForm({ lang }) {
   };
 
   useEffect(() => {
-    fetchAccounts(search);
-  }, [search]);
-
-  useEffect(() => {
+    fetchAccounts();
     fetchMainAccounts();
   }, []);
 
-  // إظهار الرسالة مع مؤقت
+  useEffect(() => {
+    fetchAccounts();
+  }, [search]);
+
   const showMessage = (msg) => {
     setMessage(msg);
     setTimeout(() => setMessage(""), 3000);
   };
 
-  // حفظ أو تعديل
+  const resetForm = () => {
+    setAccNo("");
+    setAccName("");
+    setMainNo("");
+    setEditingId(null);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!accNo || !accName || !mainNo) return;
+
+    // التحقق من التكرار
+    const duplicate = accounts.find(
+      (acc) => acc.SUBMAIN_NO === accNo && acc.SUBMAIN_NO !== editingId
+    );
+    if (duplicate) {
+      showMessage(lang === "ar" ? "رقم الحساب موجود مسبقاً" : "Account No already exists");
+      return;
+    }
+
     try {
-      if (editing) {
-        await axios.put(`http://localhost:5000/api/accounts/${editing}`, {
-          accName,
-          mainNo,
-        });
-        showMessage(lang === "ar" ? "تم التعديل بنجاح " : "Account updated ");
-      } else {
-        await axios.post("http://localhost:5000/api/accounts", {
+      if (editingId) {
+        // تعديل الحساب
+        await axios.put(`http://localhost:5000/api/accounts/${editingId}`, {
           accNo,
           accName,
           mainNo,
         });
-        showMessage(lang === "ar" ? "تم الحفظ بنجاح " : "Account saved ");
+
+        setAccounts(prev =>
+          prev.map(acc =>
+            acc.SUBMAIN_NO === editingId
+              ? { ...acc, SUBMAIN_NO: accNo, SUBMAIN_NAME: accName, SUBMAIN_MAIN_NO: mainNo, MAIN_NAME: mainAccounts.find(m => m.MAIN_NO === mainNo)?.MAIN_NAME || "" }
+              : acc
+          )
+        );
+
+        showMessage(lang === "ar" ? "تم التعديل بنجاح" : "Updated");
+      } else {
+        // إضافة حساب جديد
+        const res = await axios.post("http://localhost:5000/api/accounts", {
+          accNo,
+          accName,
+          mainNo,
+        });
+
+        const mainName = mainAccounts.find(m => m.MAIN_NO === mainNo)?.MAIN_NAME || "";
+        setAccounts(prev => [
+          ...prev,
+          { SUBMAIN_NO: accNo, SUBMAIN_NAME: accName, SUBMAIN_MAIN_NO: mainNo, MAIN_NAME: mainName }
+        ]);
+
+        showMessage(lang === "ar" ? "تم الحفظ بنجاح" : "Saved");
       }
-      setAccNo("");
-      setAccName("");
-      setMainNo("");
-      setEditing(null);
-      fetchAccounts();
+
+      resetForm();
     } catch (err) {
-      showMessage(err.response?.data?.error || "Error saving account ");
+      showMessage(err.response?.data?.error || "Error");
     }
   };
 
@@ -80,22 +113,17 @@ function AccountsForm({ lang }) {
     setAccNo(acc.SUBMAIN_NO);
     setAccName(acc.SUBMAIN_NAME);
     setMainNo(acc.SUBMAIN_MAIN_NO);
-    setEditing(acc.SUBMAIN_NO);
+    setEditingId(acc.SUBMAIN_NO);
   };
 
   const handleDelete = async (accNo) => {
-    if (
-      !window.confirm(
-        lang === "ar" ? "هل أنت متأكد من الحذف؟" : "Are you sure to delete?"
-      )
-    )
-      return;
+    if (!window.confirm(lang === "ar" ? "هل أنت متأكد من الحذف؟" : "Are you sure?")) return;
     try {
       await axios.delete(`http://localhost:5000/api/accounts/${accNo}`);
-      showMessage(lang === "ar" ? "تم الحذف " : "Account deleted ");
-      fetchAccounts();
+      setAccounts(prev => prev.filter(acc => acc.SUBMAIN_NO !== accNo));
+      showMessage(lang === "ar" ? "تم الحذف" : "Deleted");
     } catch (err) {
-      showMessage(err.response?.data?.error || "Error deleting account ");
+      showMessage(err.response?.data?.error || "Error");
     }
   };
 
@@ -106,14 +134,8 @@ function AccountsForm({ lang }) {
       <form onSubmit={handleSubmit} className="account-form">
         <div className="form-group">
           <label>{lang === "ar" ? "الحساب الرئيسي" : "Main Account"}</label>
-          <select
-            value={mainNo}
-            onChange={(e) => setMainNo(e.target.value)}
-            required
-          >
-            <option value="">
-              {lang === "ar" ? "اختر الحساب" : "Select account"}
-            </option>
+          <select value={mainNo} onChange={(e) => setMainNo(e.target.value)} required>
+            <option value="">{lang === "ar" ? " اختر الحساب " : "Select  High Sub Accounts"}</option>
             {mainAccounts.map((acc) => (
               <option key={acc.MAIN_NO} value={acc.MAIN_NO}>
                 {acc.MAIN_NO} - {acc.MAIN_NAME}
@@ -129,7 +151,6 @@ function AccountsForm({ lang }) {
             value={accNo}
             onChange={(e) => setAccNo(e.target.value)}
             required
-            readOnly={editing ? true : false}
           />
         </div>
 
@@ -145,20 +166,10 @@ function AccountsForm({ lang }) {
 
         <div className="form-buttons">
           <button type="submit" className="btn save">
-            {lang === "ar" ? (editing ? "تعديل" : "حفظ") : editing ? "Update" : "Save"}
+            {editingId ? (lang === "ar" ? "تعديل" : "Update") : (lang === "ar" ? "حفظ" : "Save")}
           </button>
-
-          {editing && (
-            <button
-              type="button"
-              className="btn cancel"
-              onClick={() => {
-                setAccNo("");
-                setAccName("");
-                setMainNo("");
-                setEditing(null);
-              }}
-            >
+          {editingId && (
+            <button type="button" className="btn cancel" onClick={resetForm}>
               {lang === "ar" ? "إلغاء" : "Cancel"}
             </button>
           )}
@@ -167,15 +178,10 @@ function AccountsForm({ lang }) {
 
       {message && <div className="toast success">{message}</div>}
 
-      {/* Live Search */}
-      <div className="form-header" style={{ marginBottom: "15px" }}>
+      <div className="form-header">
         <div className="form-group">
           <label>{lang === "ar" ? "بحث..." : "Search..."}</label>
-          <input
-            type="text"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
+          <input type="text" value={search} onChange={(e) => setSearch(e.target.value)} />
         </div>
       </div>
 
@@ -189,8 +195,8 @@ function AccountsForm({ lang }) {
           </tr>
         </thead>
         <tbody>
-          {accounts.map((acc) => (
-            <tr key={acc.SUBMAIN_NO}>
+          {accounts.map((acc, index) => (
+            <tr key={`${acc.SUBMAIN_NO}-${index}`}>
               <td>{acc.SUBMAIN_NO}</td>
               <td>{acc.SUBMAIN_NAME}</td>
               <td>{acc.MAIN_NAME || acc.SUBMAIN_MAIN_NO}</td>
@@ -198,10 +204,7 @@ function AccountsForm({ lang }) {
                 <button className="btn save" onClick={() => handleEdit(acc)}>
                   {lang === "ar" ? "تعديل" : "Edit"}
                 </button>
-                <button
-                  className="btn delete"
-                  onClick={() => handleDelete(acc.SUBMAIN_NO)}
-                >
+                <button className="btn delete" onClick={() => handleDelete(acc.SUBMAIN_NO)}>
                   {lang === "ar" ? "حذف" : "Delete"}
                 </button>
               </td>
