@@ -1,98 +1,75 @@
-.voucher-container {
-  max-width: 1000px;
-  width: 95%;
-  margin: 30px auto;
-  background: #fff;
-  padding: 25px;
-  border-radius: 12px;
-  box-shadow: 0 4px 15px rgba(21, 63, 77, 0.2);
-  font-family: "Cairo", sans-serif;
-  box-sizing: border-box;
-}
-
-.voucher-container h2 {
-  text-align: center;
-  margin-bottom: 20px;
-  color: #153F4D;
-}
-
-/* كل قسم مستقل */
-.card-section {
-  background: #f9f9f9;
-  padding: 15px 20px;
-  border-radius: 12px;
-  margin-bottom: 25px;
-  box-shadow: 0 2px 8px rgba(21, 63, 77, 0.1);
-}
-
-.card-section h3 {
-  text-align: center;
-  color: #153F4D;
-  margin-bottom: 10px;
-}
-
-.card-section h4 {
-  margin-top: 10px;
-  margin-bottom: 5px;
-  font-weight: bold;
-  color: #1F5869;
-}
-
-.row {
-  display: flex;
-  justify-content: space-between;
-  padding: 4px 0;
-}
-
-.totals {
-  display: flex;
-  justify-content: space-between;
-  font-weight: bold;
-  color: #1F5869;
-  border-top: 1px solid #C8E2E1;
-  padding-top: 5px;
-  margin-top: 5px;
-}
-
-.grand-total {
-  font-size: 1.1em;
-  border-top: 2px solid #153F4D;
-  margin-top: 10px;
-}
-
-.form-actions {
-  text-align: center;
+.balance-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 25px;
   margin-top: 20px;
 }
 
-.btn {
-  padding: 10px 20px;
-  border: none;
-  cursor: pointer;
-  border-radius: 6px;
-  font-family: "Cairo", sans-serif;
-  margin: 5px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.15);
-  transition: all 0.3s ease;
+.balance-box {
+  background: #f0f6f6;
+  border: 1px solid #C8E2E1;
+  border-radius: 10px;
+  padding: 15px;
 }
 
-.btn.save {
+.balance-header {
   background: #153F4D;
   color: #fff;
+  text-align: center;
+  padding: 8px;
+  border-radius: 6px;
+  margin-bottom: 10px;
 }
 
-.btn.save:hover {
-  background: #1F5869;
+.balance-section {
+  background: #fff;
+  border: 1px solid #C8E2E1;
+  border-radius: 8px;
+  padding: 10px;
+  margin-bottom: 10px;
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-  .card-section {
-    width: 100%;
-  }
-  .row, .totals {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 2px;
-  }
+.balance-section h4 {
+  color: #153F4D;
+  margin-bottom: 8px;
+  font-weight: bold;
 }
+
+.balance-section ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.balance-section li {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 0;
+  color: #1F5869;
+  border-bottom: 1px solid #E0EFEF;
+}
+
+.balance-section li:last-child {
+  border-bottom: none;
+}
+
+.total-row {
+  font-weight: bold;
+  color: #153F4D;
+  background: #C8E2E1;
+  padding: 6px;
+  border-radius: 6px;
+  margin-top: 6px;
+}
+
+.total-box {
+  background: #77C8BF;
+  color: #153F4D;
+  text-align: center;
+  padding: 8px;
+  border-radius: 8px;
+  font-weight: bold;
+  margin-top: 10px;
+}
+
+

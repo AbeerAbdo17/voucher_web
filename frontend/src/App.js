@@ -32,10 +32,6 @@ useEffect(() => {
 }, []);
 
 
-
-
-
-
 const navigate = (path) => {
   switch (path) {
     case "/login":

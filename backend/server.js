@@ -1715,70 +1715,31 @@ usersRouter.put("/:id/permissions", async (req, res) => {
 
 app.get("/api/reports/balance-sheet", authMiddleware(), async (req, res) => {
   try {
-    const [rows] = await pool.query(
-      `
+    const [rows] = await pool.query(`
       SELECT 
-        b.BAND_NAME AS band_name,
-        b.BAND_TYPE AS band_type,
         sb.subbname AS subband_name,
-        m.MAIN_NAME AS main_name,
-        sm.SUBMAIN_NAME AS submain_name,
-        SUM(IFNULL(j.JOURNAL_DR, 0) - IFNULL(j.JOURNAL_CR, 0)) AS balance
+        SUM(IFNULL(j.JOURNAL_DR, 0) - IFNULL(j.JOURNAL_CR, 0)) AS total_balance
       FROM journal j
       LEFT JOIN submain sm ON j.JOURNAL_SUBMAIN_NO = sm.SUBMAIN_NO
       LEFT JOIN main m ON sm.SUBMAIN_MAIN_NO = m.MAIN_NO
       LEFT JOIN subband sb ON m.MAIN_BAND_NO = sb.subbno
-      LEFT JOIN band b ON sb.subb_band_no = b.BAND_NO
-      GROUP BY b.BAND_NAME, b.BAND_TYPE, sb.subbname, m.MAIN_NAME, sm.SUBMAIN_NAME
-      ORDER BY b.BAND_NO, sb.subbno, m.MAIN_NO, sm.SUBMAIN_NO;
-      `
-    );
+      GROUP BY sb.subbname
+      ORDER BY sb.subbno;
+    `);
 
-    // هيكل التقرير النهائي
-    const assets = { current: [], nonCurrent: [] };
-    const liabilities = { current: [], nonCurrent: [], equity: [] };
+    // هيكل البيانات النهائي
+    const subbands = rows.map(r => ({
+      name: r.subband_name,
+      amount: Number(r.total_balance) || 0,
+    }));
 
-    // التصنيف الذكي بناءً على band_type وأسماء الحسابات
-    rows.forEach(r => {
-      const name = r.submain_name || r.main_name || r.subband_name || r.band_name || "";
-      const amount = Number(r.balance) || 0;
-
-      switch (r.band_type) {
-        case "الأصول":
-          // تصنيف الأصول: متداولة وغير متداولة
-          if (/نقد|خزين|سيولة|مدينة|المخزون|زبون|عملاء|الحسابات المدينة|cash|inventory|receivable/i.test(name)) {
-            assets.current.push({ name, amount });
-          } else {
-            assets.nonCurrent.push({ name, amount });
-          }
-          break;
-
-        case "الخصوم":
-          // تصنيف الخصوم: متداولة وغير متداولة
-          if (/دائن|مورد|التزامات قصيرة|رواتب مستحقة|مدفوعات|payable|accrued/i.test(name)) {
-            liabilities.current.push({ name, amount });
-          } else {
-            liabilities.nonCurrent.push({ name, amount });
-          }
-          break;
-
-        case "حقوق الملكية":
-          liabilities.equity.push({ name, amount });
-          break;
-
-        default:
-          // لو ما اتعرفش النوع، نحسبه كأصل غير متداول افتراضياً
-          assets.nonCurrent.push({ name, amount });
-          break;
-      }
-    });
-
-    res.json({ assets, liabilities });
+    res.json({ subbands });
   } catch (err) {
     console.error("Balance Sheet Report Error:", err);
     res.status(500).json({ error: err.message });
   }
 });
+
 
 
 

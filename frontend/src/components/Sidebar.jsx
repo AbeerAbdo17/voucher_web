@@ -31,7 +31,7 @@ function Sidebar({ lang, setLang, navigate }) {
     { key: "balanceSheet", name: lang === "ar" ? "الميزانية العمومية" : "Balance Sheet" },
     // { key: "journalReport", name: lang === "ar" ? "تقرير اليومية" : "Journal Report" },
     // { key: "profitLoss", name: lang === "ar" ? "قائمة الأرباح والخسائر" : "Profit & Loss" },
-    // أضف تقارير أكثر حسب الحاجة
+    
   ];
 
   // 🔹 تبديل اللغة
