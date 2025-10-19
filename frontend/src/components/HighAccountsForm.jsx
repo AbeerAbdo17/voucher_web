@@ -1,8 +1,13 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
-import "./HighAccountsForm.css";
+import api from "../api";
+import "./style/HighAccountsForm.css";
 
-function HighAccountsForm({ lang }) {
+function HighAccountsForm({ lang, permissions }) {
+  const screen = "AccountsHigh"; 
+  const canView = permissions[screen]?.view;
+  const canEdit = permissions[screen]?.edit;
+  const canDelete = permissions[screen]?.delete;
+
   const [mainNo, setMainNo] = useState("");
   const [mainName, setMainName] = useState("");
   const [mainBandNo, setMainBandNo] = useState("");
@@ -14,7 +19,7 @@ function HighAccountsForm({ lang }) {
 
   const fetchHighAccounts = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/high-accounts");
+      const res = await api.get("/high-accounts");
       setHighAccounts(res.data);
     } catch (err) {
       console.error(err);
@@ -23,7 +28,7 @@ function HighAccountsForm({ lang }) {
 
   const fetchSubAccounts = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/sub-accounts", { params: { search } });
+      const res = await api.get("/sub-accounts", { params: { search } });
       setSubAccounts(res.data);
     } catch (err) {
       console.error(err);
@@ -56,49 +61,57 @@ function HighAccountsForm({ lang }) {
     if (!mainNo || !mainName || !mainBandNo) return;
 
     try {
-if (editingId) {
-  // تحقق من التكرار للـ MAIN_NO
-  const duplicate = subAccounts.find(
-    (acc) => acc.MAIN_NO === mainNo && acc.ID !== editingId
-  );
-  if (duplicate) {
-    showMessage(lang === "ar" ? "رقم الحساب موجود مسبقاً" : "Account No already exists");
-    return;
-  }
+      if (editingId) {
+        // تحقق من التكرار
+        const duplicate = subAccounts.find(
+          (acc) => acc.MAIN_NO === mainNo && acc.ID !== editingId
+        );
+        if (duplicate) {
+          showMessage(lang === "ar" ? "رقم الحساب موجود مسبقاً" : "Account No already exists");
+          return;
+        }
 
-  await axios.put(`http://localhost:5000/api/sub-accounts/${editingId}`, {
-    MAIN_NO: mainNo,
-    MAIN_NAME: mainName,
-    MAIN_BAND_NO: mainBandNo,
-  });
+        await api.put(`/sub-accounts/${editingId}`, {
+          MAIN_NO: mainNo,
+          MAIN_NAME: mainName,
+          MAIN_BAND_NO: mainBandNo,
+        });
 
-  // تحديث الصف مباشرة في الـ state
-  setSubAccounts(prev =>
-    prev.map(acc =>
-      acc.ID === editingId
-        ? {
-            ...acc,
+        setSubAccounts((prev) =>
+          prev.map((acc) =>
+            acc.ID === editingId
+              ? {
+                  ...acc,
+                  MAIN_NO: mainNo,
+                  MAIN_NAME: mainName,
+                  MAIN_BAND_NO: mainBandNo,
+                  high_account_name:
+                    highAccounts.find((h) => h.subb_band_no === mainBandNo)?.subbname || "",
+                }
+              : acc
+          )
+        );
+
+        showMessage(lang === "ar" ? "تم التعديل بنجاح" : "Updated");
+      } else {
+        const res = await api.post("/sub-accounts", {
+          MAIN_NO: mainNo,
+          MAIN_NAME: mainName,
+          MAIN_BAND_NO: mainBandNo,
+        });
+
+        const highName =
+          highAccounts.find((h) => h.subb_band_no === mainBandNo)?.subbname || "";
+        setSubAccounts((prev) => [
+          ...prev,
+          {
+            ID: res.data.id,
             MAIN_NO: mainNo,
             MAIN_NAME: mainName,
             MAIN_BAND_NO: mainBandNo,
-            high_account_name: highAccounts.find(h => h.subb_band_no === mainBandNo)?.subbname || ""
-          }
-        : acc
-    )
-  );
-
-  showMessage(lang === "ar" ? "تم التعديل بنجاح" : "Updated");
-}
- else {
-        const res = await axios.post("http://localhost:5000/api/sub-accounts", {
-          MAIN_NO: mainNo,
-          MAIN_NAME: mainName,
-          MAIN_BAND_NO: mainBandNo
-        });
-
-        // إضافة الصف الجديد مباشرة
-        const highName = highAccounts.find(h => h.subb_band_no === mainBandNo)?.subbname || "";
-        setSubAccounts(prev => [...prev, { ID: res.data.id, MAIN_NO: mainNo, MAIN_NAME: mainName, MAIN_BAND_NO: mainBandNo, high_account_name: highName }]);
+            high_account_name: highName,
+          },
+        ]);
 
         showMessage(lang === "ar" ? "تم الحفظ بنجاح" : "Saved");
       }
@@ -119,62 +132,97 @@ if (editingId) {
   const handleDelete = async (mainNo) => {
     if (!window.confirm(lang === "ar" ? "هل أنت متأكد من الحذف؟" : "Are you sure?")) return;
     try {
-      await axios.delete(`http://localhost:5000/api/sub-accounts/${mainNo}`);
-      setSubAccounts(prev => prev.filter(acc => acc.MAIN_NO !== mainNo));
+      await api.delete(`/sub-accounts/${mainNo}`);
+      setSubAccounts((prev) => prev.filter((acc) => acc.MAIN_NO !== mainNo));
       showMessage(lang === "ar" ? "تم الحذف" : "Deleted");
     } catch (err) {
       showMessage(err.response?.data?.error || "Error");
     }
   };
 
+  // 🧱 صلاحية العرض
+  if (!canView) {
+    return (
+      <div className="no-access">
+        {lang === "ar" ? "لا توجد صلاحية للعرض" : "No permission to view this page"}
+      </div>
+    );
+  }
+
   return (
     <div className="account-container">
-      <h2>{lang === "ar" ?  "الحسابات الفرعية" : "High Sub Accounts"}</h2>
+      <h2>{lang === "ar" ? "الحسابات الفرعية العليا" : "High Sub Accounts"}</h2>
 
-      <form onSubmit={handleSubmit} className="account-form">
-        <div className="form-group">
-          <label>{lang === "ar" ? "الحساب الرئيسي" : "Main Account"}</label>
-          <select value={mainBandNo} onChange={(e) => setMainBandNo(e.target.value)} required>
-            <option value="">{lang === "ar" ? "  اختر الحساب " : "Select High Account"}</option>
-            {highAccounts.map(acc => (
-              <option key={acc.ID} value={acc.subb_band_no}>{acc.subbname}</option>
-            ))}
-          </select>
-        </div>
+      {/* 🧾 النموذج - يظهر فقط لو عندك صلاحية تعديل */}
+      {canEdit && (
+        <form onSubmit={handleSubmit} className="account-form">
+          <div className="form-group">
+            <label>{lang === "ar" ? "الحساب الرئيسي" : "Main Account"}</label>
+            <select
+              value={mainBandNo}
+              onChange={(e) => setMainBandNo(e.target.value)}
+              required
+            >
+              <option value="">
+                {lang === "ar" ? "اختر الحساب" : "Select High Account"}
+              </option>
+              {highAccounts.map((acc) => (
+                <option key={acc.ID} value={acc.subb_band_no}>
+                  {acc.subbname}
+                </option>
+              ))}
+            </select>
+          </div>
 
-        <div className="form-group">
-          <label>{lang === "ar" ? "رقم الحساب الفرعي" : "Sub Account No"}</label>
-          <input
-            type="text"
-            value={mainNo}
-            onChange={(e) => setMainNo(e.target.value)}
-            required
-          />
-        </div>
+          <div className="form-group">
+            <label>{lang === "ar" ? "رقم الحساب الفرعي" : "Sub Account No"}</label>
+            <input
+              type="text"
+              value={mainNo}
+              onChange={(e) => setMainNo(e.target.value)}
+              required
+            />
+          </div>
 
-        <div className="form-group">
-          <label>{lang === "ar" ? "اسم الحساب الفرعي" : "Sub Account Name"}</label>
-          <input type="text" value={mainName} onChange={(e) => setMainName(e.target.value)} required />
-        </div>
+          <div className="form-group">
+            <label>{lang === "ar" ? "اسم الحساب الفرعي" : "Sub Account Name"}</label>
+            <input
+              type="text"
+              value={mainName}
+              onChange={(e) => setMainName(e.target.value)}
+              required
+            />
+          </div>
 
-        <div className="form-buttons">
-          <button type="submit" className="btn save">
-            {editingId ? (lang === "ar" ? "تعديل" : "Update") : (lang === "ar" ? "حفظ" : "Save")}
-          </button>
-          {editingId && (
-            <button type="button" className="btn cancel" onClick={resetForm}>
-              {lang === "ar" ? "إلغاء" : "Cancel"}
+          <div className="form-buttons">
+            <button type="submit" className="btn save">
+              {editingId
+                ? lang === "ar"
+                  ? "تعديل"
+                  : "Update"
+                : lang === "ar"
+                ? "حفظ"
+                : "Save"}
             </button>
-          )}
-        </div>
-      </form>
+            {editingId && (
+              <button type="button" className="btn cancel" onClick={resetForm}>
+                {lang === "ar" ? "إلغاء" : "Cancel"}
+              </button>
+            )}
+          </div>
+        </form>
+      )}
 
       {message && <div className="toast success">{message}</div>}
 
       <div className="form-header">
         <div className="form-group">
           <label>{lang === "ar" ? "بحث..." : "Search..."}</label>
-          <input type="text" value={search} onChange={(e) => setSearch(e.target.value)} />
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
         </div>
       </div>
 
@@ -188,22 +236,28 @@ if (editingId) {
           </tr>
         </thead>
         <tbody>
-   {subAccounts.map((acc, index) => (
-  <tr key={`${acc.ID}-${acc.MAIN_NO}-${index}`}>
-    <td>{acc.MAIN_NO}</td>
-    <td>{acc.MAIN_NAME}</td>
-    <td>{acc.high_account_name || ""}</td>
-    <td>
-      <button className="btn save" onClick={() => handleEdit(acc)}>
-        {lang === "ar" ? "تعديل" : "Edit"}
-      </button>
-      <button className="btn delete" onClick={() => handleDelete(acc.MAIN_NO)}>
-        {lang === "ar" ? "حذف" : "Delete"}
-      </button>
-    </td>
-  </tr>
-))}
-
+          {subAccounts.map((acc, index) => (
+            <tr key={`${acc.ID}-${acc.MAIN_NO}-${index}`}>
+              <td>{acc.MAIN_NO}</td>
+              <td>{acc.MAIN_NAME}</td>
+              <td>{acc.high_account_name || ""}</td>
+              <td>
+                {canEdit && (
+                  <button className="btn save" onClick={() => handleEdit(acc)}>
+                    {lang === "ar" ? "تعديل" : "Edit"}
+                  </button>
+                )}
+                {canDelete && (
+                  <button
+                    className="btn delete"
+                    onClick={() => handleDelete(acc.SUBMAIN_NO)}
+                  >
+                    {lang === "ar" ? "حذف" : "Delete"}
+                  </button>
+                )}
+              </td>
+            </tr>
+          ))}
         </tbody>
       </table>
     </div>
