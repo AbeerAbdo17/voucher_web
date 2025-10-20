@@ -1,112 +1,96 @@
 .sidebar {
-  height: 100vh;
-  background: #153F4D;
-  color: #fff;
-  display: flex;
-  flex-direction: column;
   position: fixed;
   top: 0;
-  transition: width 0.3s ease, transform 0.3s ease;
-  box-shadow: 2px 0 10px rgba(0,0,0,0.2);
+  bottom: 0;
+  width: 250px;
+  background-color: #153f4d;
+  color: #fff;
+  transition: all 0.3s ease;
   z-index: 1000;
-  overflow: hidden;
+  overflow-y: auto;
 }
 
-/* الحالة المفتوحة */
-.sidebar.open {
-  width: 220px;
-  transform: translateX(0);
-}
-
-/* الحالة المطوية */
 .sidebar.collapsed {
-  width: 60px;
+  width: 70px;
 }
 
-/* زر الفتح */
+.sidebar.rtl {
+  direction: rtl;
+}
+
+.sidebar.ltr {
+  direction: ltr;
+}
+
 .toggle-btn {
-  display: flex;
-  justify-content: flex-end;
-  padding: 10px;
+  padding: 15px;
   cursor: pointer;
-  color: #77C8BF;
+  text-align: center;
+  background-color: #12404d;
+  color: white;
+  border-bottom: 1px solid #0e2f38;
 }
 
-/* القائمة */
 .menu {
   list-style: none;
   padding: 0;
   margin: 0;
-  flex: 1;
 }
 
 .menu li {
+  padding: 14px 18px;
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 12px;
   cursor: pointer;
-  transition: background 0.3s;
+  transition: all 0.2s;
+  /* border-bottom: 1px solid rgba(255, 255, 255, 0.05); */
 }
 
 .menu li:hover {
-  background: #1F5869;
+  background-color: #1f5565;
 }
 
-.menu span {
-  font-size: 14px;
-  font-weight: bold;
+.menu li span {
+  flex: 1;
+  font-size: 15px;
   white-space: nowrap;
 }
 
-/* إخفاء النص عند الطي */
-.sidebar.collapsed .menu span {
+.sidebar.collapsed .menu li span {
   display: none;
 }
 
-.sidebar.collapsed .toggle-btn {
-  justify-content: center;
+/* 🔹 Submenu */
+.submenu .submenu-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
-/* ======== Responsive ======== */
-
-/* شاشات تابلت متوسطة */
-@media (max-width: 1024px) {
-  .sidebar {
-    width: 60px; /* مطوي افتراضياً */
-  }
-
-  .sidebar.open {
-    width: 220px;
-  }
-
-  .sidebar.collapsed {
-    width: 60px;
-  }
+.submenu .arrow {
+  font-size: 12px;
 }
 
-/* شاشات الموبايل */
-@media (max-width: 768px) {
-  .sidebar {
-    position: fixed;
-    top: 0;
-    width: 220px;        /* عرض السايدبار الكامل */
-    height: 100vh;
-    transform: translateX(-100%); /* مخفي افتراضياً */
-    transition: transform 0.3s ease;
-  }
-
-  .sidebar.open {
-    transform: translateX(0); /* يظهر كامل */
-  }
-
-  .sidebar.collapsed {
-    transform: translateX(-100%); /* مخفي */
-  }
-
-  .sidebar .toggle-btn {
-    justify-content: flex-start;
-    padding-left: 15px;
-  }
+.submenu-items {
+  list-style: none;
+  margin: 5px 0 0;
+  padding: 0;
+  background-color: #11414f;
+  border-radius: 5px;
+  overflow: hidden;
 }
 
+.submenu-items li {
+  padding: 10px 25px;
+  font-size: 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.submenu-items li:hover {
+  background-color: #196272;
+}
+
+.submenu.active .submenu-header {
+  background-color: #196272;
+}

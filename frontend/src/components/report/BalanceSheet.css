@@ -1,75 +1,97 @@
-.balance-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 25px;
-  margin-top: 20px;
+.voucher-container {
+  background-color: #f9fdfd;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  max-width: 900px;
+  margin: 40px auto;
+  border: 1px solid #cde4e3;
+  font-family: "Cairo", Arial, sans-serif;
 }
 
-.balance-box {
-  background: #f0f6f6;
-  border: 1px solid #C8E2E1;
-  border-radius: 10px;
-  padding: 15px;
-}
-
-.balance-header {
-  background: #153F4D;
-  color: #fff;
-  text-align: center;
-  padding: 8px;
-  border-radius: 6px;
-  margin-bottom: 10px;
-}
-
-.balance-section {
-  background: #fff;
-  border: 1px solid #C8E2E1;
-  border-radius: 8px;
-  padding: 10px;
-  margin-bottom: 10px;
-}
-
-.balance-section h4 {
+.voucher-container h2 {
   color: #153F4D;
-  margin-bottom: 8px;
+  text-align: center;
+  margin-bottom: 25px;
   font-weight: bold;
+  font-size: 26px;
+  letter-spacing: 0.5px;
 }
 
-.balance-section ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
+.voucher-container table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
 }
 
-.balance-section li {
-  display: flex;
-  justify-content: space-between;
-  padding: 4px 0;
-  color: #1F5869;
+.voucher-container th {
+  background-color: #153F4D;
+  color: white;
+  padding: 10px;
+  font-size: 16px;
+  /* text-align: center; */
+}
+
+
+.voucher-container td {
+  padding: 10px;
   border-bottom: 1px solid #E0EFEF;
+  color: #1F5869;
+  font-size: 15px;
 }
 
-.balance-section li:last-child {
+.voucher-container tr:last-child td {
   border-bottom: none;
 }
 
-.total-row {
-  font-weight: bold;
-  color: #153F4D;
-  background: #C8E2E1;
-  padding: 6px;
-  border-radius: 6px;
-  margin-top: 6px;
+.voucher-container tbody tr:hover {
+  background-color: #f0f6f6;
 }
 
-.total-box {
-  background: #77C8BF;
+.voucher-container tr.total-row {
+  background-color: #C8E2E1 !important;
+  font-weight: bold;
   color: #153F4D;
+}
+
+.form-actions {
   text-align: center;
-  padding: 8px;
-  border-radius: 8px;
-  font-weight: bold;
-  margin-top: 10px;
+  margin-top: 25px;
 }
 
+.btn.save {
+  background-color: #153F4D;
+  color: white;
+  border: none;
+  padding: 10px 25px;
+  font-size: 15px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.btn.save:hover {
+  background-color: #1f5869;
+}
+
+/* دعم الاتجاه العربي */
+[dir="rtl"] .voucher-container table {
+  text-align: right;
+}
+
+[dir="ltr"] .voucher-container table {
+  text-align: left;
+}
+
+.table-head-ar {
+  direction: rtl;
+  text-align: right;
+}
+
+.table-head-en {
+  direction: ltr;
+  text-align: left;
+}
 

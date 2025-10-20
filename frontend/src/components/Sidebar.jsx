@@ -8,6 +8,8 @@ import {
   FaBoxes,
   FaGlobe,
   FaUsersCog,
+  FaChevronDown,
+  FaChevronUp,
 } from "react-icons/fa";
 import "./style/Sidebar.css";
 
@@ -17,38 +19,29 @@ function Sidebar({ lang, setLang, navigate }) {
   const [isAdmin, setIsAdmin] = useState(false);
   const [showReports, setShowReports] = useState(false);
 
-  // 🔹 تحميل البيانات من localStorage
   useEffect(() => {
     const role = localStorage.getItem("userRole");
     const allowedScreens = JSON.parse(localStorage.getItem("screens") || "[]");
-    console.log("✅ Loaded screens from localStorage:", allowedScreens);
     setIsAdmin(role === "admin");
     setScreens(allowedScreens);
   }, []);
 
-  // 🔹 التقارير المتاحة
   const availableReports = [
     { key: "balanceSheet", name: lang === "ar" ? "الميزانية العمومية" : "Balance Sheet" },
-    // { key: "journalReport", name: lang === "ar" ? "تقرير اليومية" : "Journal Report" },
-    // { key: "profitLoss", name: lang === "ar" ? "قائمة الأرباح والخسائر" : "Profit & Loss" },
-    
   ];
 
-  // 🔹 تبديل اللغة
   const toggleLanguage = () => {
     const newLang = lang === "ar" ? "en" : "ar";
     setLang(newLang);
     document.documentElement.dir = newLang === "ar" ? "rtl" : "ltr";
   };
 
-  // 🔹 تسجيل الخروج
   const handleLogout = () => {
     alert(lang === "ar" ? "تم تسجيل الخروج" : "Logged out");
     localStorage.clear();
     navigate("/login");
   };
 
-  // 🔹 الانتقال إلى صفحة (فقط المسموح بها)
   const handleNavigate = (path, screenKey) => {
     if (!isAdmin && !screens.includes(screenKey)) {
       alert(lang === "ar" ? "ليس لديك صلاحية لهذه الصفحة" : "Access denied");
@@ -58,7 +51,6 @@ function Sidebar({ lang, setLang, navigate }) {
     setOpen(false);
   };
 
-  // 🔹 الترجمات
   const t = {
     ar: {
       journal: "قيد اليومية",
@@ -84,7 +76,7 @@ function Sidebar({ lang, setLang, navigate }) {
 
   return (
     <div
-      className={`sidebar ${open ? "open" : "collapsed"}`}
+      className={`sidebar ${open ? "open" : "collapsed"} ${lang === "ar" ? "rtl" : "ltr"}`}
       style={{ [lang === "ar" ? "right" : "left"]: 0 }}
     >
       <div className="toggle-btn" onClick={() => setOpen(!open)}>
@@ -92,52 +84,48 @@ function Sidebar({ lang, setLang, navigate }) {
       </div>
 
       <ul className="menu">
-        {/* 🔹 اللغة */}
         <li onClick={toggleLanguage}>
           <FaGlobe /> <span>{t.langSwitch}</span>
         </li>
 
-        {/* 🔹 صفحة إدارة المستخدمين */}
         {(isAdmin || screens.includes("Users")) && (
           <li onClick={() => handleNavigate("/admin-users", "Users")}>
             <FaUsersCog /> <span>{t.users}</span>
           </li>
         )}
 
-        {/* 🔹 قيد اليومية */}
         {screens.includes("Journal") && (
           <li onClick={() => handleNavigate("/voucher", "Journal")}>
             <FaBook /> <span>{t.journal}</span>
           </li>
         )}
 
-        {/* 🔹 الحسابات */}
         {screens.includes("AccountsBase") && (
           <li onClick={() => handleNavigate("/accounts", "AccountsBase")}>
             <FaWallet /> <span>{t.accounts}</span>
           </li>
         )}
 
-        {/* 🔹 الحسابات الفرعية */}
         {screens.includes("AccountsHigh") && (
           <li onClick={() => handleNavigate("/HighAccounts", "AccountsHigh")}>
             <FaLayerGroup /> <span>{t.highAccounts}</span>
           </li>
         )}
 
-        {/* 🔹 الحسابات العليا */}
         {screens.includes("AccountsBands") && (
           <li onClick={() => handleNavigate("/HighBands", "AccountsBands")}>
             <FaBoxes /> <span>{t.highBands}</span>
           </li>
         )}
 
-        {/* 🔹 التقارير */}
         {screens.includes("Reports") && (
-          <li className="submenu">
-            <span onClick={() => setShowReports(!showReports)}>
+          <li
+            className={`submenu ${showReports ? "active" : ""}`}
+            onClick={() => setShowReports(!showReports)}
+          >
+            <div className="submenu-header">
               <FaBook /> <span>{t.reports}</span>
-            </span>
+            </div>
             {showReports && (
               <ul className="submenu-items">
                 {availableReports.map((r) => (
@@ -153,7 +141,6 @@ function Sidebar({ lang, setLang, navigate }) {
           </li>
         )}
 
-        {/* 🔹 تسجيل الخروج */}
         <li onClick={handleLogout}>
           <FaSignOutAlt /> <span>{t.logout}</span>
         </li>

@@ -32,41 +32,43 @@ const printPDF = () => {
   const element = document.createElement("div");
 
   element.innerHTML = `
-    <div style="font-family: Arial, sans-serif; padding: 20px;">
+    <div style="font-family: 'Cairo', Arial, sans-serif; padding: 30px; color: #153F4D;">
       
-      <!-- الهيدر: لوجو على اليسار واسم التقرير على اليمين -->
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+      <!-- الرأس (اللوجو + عنوان التقرير) بدون خط تحت الهيدر -->
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; padding-bottom: 15px;">
         <div>
-          <img src="${logoImg}" style="height:50px;" />
+          <img src="${logoImg}" alt="Logo" style="height:80px; width:auto;" />
         </div>
-        <div style="font-size:24px; font-weight:bold; text-align: right;">
+        <div style="font-size: 26px; font-weight: 700; text-align: right;">
           ${t.title}
         </div>
       </div>
 
-      <!-- الجدول -->
-      <div style="${lang === 'ar' ? 'direction: rtl; text-align: right;' : 'direction: ltr; text-align: left;'}">
-        <table style="width:100%; border-collapse: collapse;">
+      <!-- محتوى التقرير -->
+      <div style="${lang === 'ar' ? 'direction: rtl; text-align: right;' : 'direction: ltr; text-align: left;'} font-size: 16px;">
+        
+        <table style="width: 100%; border-collapse: collapse; margin-top: 20px; box-shadow: 0 0 6px rgba(0,0,0,0.1);">
           <thead>
-            <tr>
-              <th style="border:1px solid #C8E2E1; padding:5px;">${t.subband}</th>
-              <th style="border:1px solid #C8E2E1; padding:5px; text-align:end;">${t.total}</th>
+            <tr style="background-color: #e8f1f1;">
+              <th style="border: 1px solid #153F4D; padding: 10px; font-size: 17px;">${t.subband}</th>
+              <th style="border: 1px solid #153F4D; padding: 10px; text-align: end; font-size: 17px;">${t.total}</th>
             </tr>
           </thead>
           <tbody>
             ${subbands.map(s => `
               <tr>
-                <td style="border:1px solid #C8E2E1; padding:5px;">${s.name}</td>
-                <td style="border:1px solid #C8E2E1; padding:5px; text-align:end;">${s.amount.toLocaleString()}</td>
+                <td style="border: 1px solid #d1e3e3; padding: 8px;">${s.name}</td>
+                <td style="border: 1px solid #d1e3e3; padding: 8px; text-align: end;">${s.amount.toLocaleString()}</td>
               </tr>
             `).join("")}
-            <tr style="background:#f0f6f6;">
-              <td><strong>${t.total}</strong></td>
-              <td style="text-align:end;"><strong>${calcTotal(subbands).toLocaleString()}</strong></td>
+            <tr style="background-color: #f5fafb; font-weight: bold; border-top: 2px solid #153F4D;">
+              <td style="padding: 10px;">${t.total}</td>
+              <td style="padding: 10px; text-align: end;">${calcTotal(subbands).toLocaleString()}</td>
             </tr>
           </tbody>
         </table>
       </div>
+  
     </div>
   `;
 
@@ -74,8 +76,8 @@ const printPDF = () => {
     .set({
       margin: [10, 10, 10, 10],
       filename: `${t.title}.pdf`,
-      image: { type: "jpeg", quality: 0.98 },
-      html2canvas: { scale: 2, letterRendering: true },
+      image: { type: "jpeg", quality: 1 },
+      html2canvas: { scale: 2, useCORS: true },
       jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
     })
     .from(element)
@@ -83,16 +85,19 @@ const printPDF = () => {
 };
 
 
+
+
   return (
     <div className="voucher-container" dir={lang === "ar" ? "rtl" : "ltr"}>
       <h2>{t.title}</h2>
       <table style={{ width: "100%", borderCollapse: "collapse" }}>
-        <thead>
-          <tr>
-            <th>{t.subband}</th>
-            <th>{t.total}</th>
-          </tr>
-        </thead>
+     <thead className={lang === "ar" ? "table-head-ar" : "table-head-en"}>
+  <tr>
+    <th>{t.subband}</th>
+    <th>{t.total}</th>
+  </tr>
+</thead>
+
         <tbody>
           {subbands.map((s, i) => (
             <tr key={i}>
