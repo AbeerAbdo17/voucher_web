@@ -14,7 +14,7 @@ const pool = mysql.createPool({
   host: "localhost",
   user: "root",
   password: "0000",
-  database: "accounting",
+  database: "accounting_web",
   waitForConnections: true,
   connectionLimit: 10,
 });
@@ -289,10 +289,12 @@ await conn.query(
 
     await conn.commit();
     res.json({ message: "Voucher saved", voucherNo });
-  } catch (err) {
-    await conn.rollback();
-    res.status(500).json({ error: err.message });
-  } finally {
+  }catch (err) {
+  console.error("Voucher save error:", err); // 👈 هذي تطبع لك الخطأ الكامل في السيرفر
+  await conn.rollback();
+  res.status(500).json({ error: err.message });
+}
+ finally {
     conn.release();
   }
 });
@@ -335,55 +337,79 @@ app.delete("/api/voucher/:id", authMiddleware(), async (req, res) => {
 });
 
 
+app.get("/api/accounts", async (req, res) => {
+  const { query, type } = req.query;
+  if (!query) return res.json([]);
+
+  try {
+    const sql =
+      type === "accNo"
+        ? `SELECT SUBMAIN_NO, SUBMAIN_NAME 
+           FROM submain 
+           WHERE SUBMAIN_NO LIKE ? OR SUBMAIN_NAME LIKE ? 
+           LIMIT 20`
+        : `SELECT SUBMAIN_NO, SUBMAIN_NAME 
+           FROM submain 
+           WHERE SUBMAIN_NAME LIKE ? OR SUBMAIN_NO LIKE ? 
+           LIMIT 20`;
+
+    const [rows] = await pool.query(sql, [`${query}%`, `${query}%`]);
+    res.json(rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // ================== Accounts APIs ==================
 
 // جلب الحسابات الخاصة بالشركة
-app.get("/api/accounts", authMiddleware(), async (req, res) => {
-  const { query, type } = req.query; // type = accNo or accName
-  try {
-    let sql = "";
-    if (type === "accNo") {
-      sql = "SELECT SUBMAIN_NO, SUBMAIN_NAME FROM submain WHERE SUBMAIN_NO LIKE ? AND company_id = ?";
-    } else {
-      sql = "SELECT SUBMAIN_NO, SUBMAIN_NAME FROM submain WHERE SUBMAIN_NAME LIKE ? AND company_id = ?";
-    }
+// app.get("/api/accounts", authMiddleware(), async (req, res) => {
+//   const { query, type } = req.query; // type = accNo or accName
+//   try {
+//     let sql = "";
+//     if (type === "accNo") {
+//       sql = "SELECT SUBMAIN_NO, SUBMAIN_NAME FROM submain WHERE SUBMAIN_NO LIKE ? AND company_id = ?";
+//     } else {
+//       sql = "SELECT SUBMAIN_NO, SUBMAIN_NAME FROM submain WHERE SUBMAIN_NAME LIKE ? AND company_id = ?";
+//     }
 
-    const [rows] = await pool.query(sql, [`%${query}%`, req.user.company_id]);
-    res.json(rows);
-  } catch (err) {
-    console.error("Accounts Search Error:", err);
-    res.status(500).json({ error: err.message });
-  }
-});
+//     const [rows] = await pool.query(sql, [`%${query}%`, req.user.company_id]);
+//     res.json(rows);
+//   } catch (err) {
+//     console.error("Accounts Search Error:", err);
+//     res.status(500).json({ error: err.message });
+//   }
+// });
 
 
 // ================== Accounts APIs ==================
-app.get("/api/accounts", authMiddleware(), async (req, res) => {
-  const { query = "", type = "accNo" } = req.query;
+// app.get("/api/accounts", authMiddleware(), async (req, res) => {
+//   const { query = "", type = "accNo" } = req.query;
 
-  try {
-    let sql = "";
-    if (type === "accNo") {
-      sql = `
-        SELECT SUBMAIN_NO, SUBMAIN_NAME, SUBMAIN_MAIN_NO, MAIN_NAME
-        FROM submain
-        LEFT JOIN main ON submain.SUBMAIN_MAIN_NO = main.MAIN_NO
-        WHERE submain.SUBMAIN_NO LIKE ? AND submain.company_id = ?`;
-    } else {
-      sql = `
-        SELECT SUBMAIN_NO, SUBMAIN_NAME, SUBMAIN_MAIN_NO, MAIN_NAME
-        FROM submain
-        LEFT JOIN main ON submain.SUBMAIN_MAIN_NO = main.MAIN_NO
-        WHERE submain.SUBMAIN_NAME LIKE ? AND submain.company_id = ?`;
-    }
+//   try {
+//     let sql = "";
+//     if (type === "accNo") {
+//       sql = `
+//         SELECT SUBMAIN_NO, SUBMAIN_NAME, SUBMAIN_MAIN_NO, MAIN_NAME
+//         FROM submain
+//         LEFT JOIN main ON submain.SUBMAIN_MAIN_NO = main.MAIN_NO
+//         WHERE submain.SUBMAIN_NO LIKE ? AND submain.company_id = ?`;
+//     } else {
+//       sql = `
+//         SELECT SUBMAIN_NO, SUBMAIN_NAME, SUBMAIN_MAIN_NO, MAIN_NAME
+//         FROM submain
+//         LEFT JOIN main ON submain.SUBMAIN_MAIN_NO = main.MAIN_NO
+//         WHERE submain.SUBMAIN_NAME LIKE ? AND submain.company_id = ?`;
+//     }
 
-    const [rows] = await pool.query(sql, [`%${query}%`, req.user.company_id]);
-    res.json(rows);
-  } catch (err) {
-    console.error("Accounts Search Error:", err);
-    res.status(500).json({ error: err.message });
-  }
-});
+//     const [rows] = await pool.query(sql, [`%${query}%`, req.user.company_id]);
+//     res.json(rows);
+//   } catch (err) {
+//     console.error("Accounts Search Error:", err);
+//     res.status(500).json({ error: err.message });
+//   }
+// });
 
 // جلب كل الحسابات (مع البحث)
 app.get("/api/accounts/all", authMiddleware(), async (req, res) => {
@@ -519,7 +545,7 @@ app.get("/api/sub-accounts", authMiddleware(), async (req, res) => {
              h.subbname AS high_account_name
       FROM main m
       LEFT JOIN subband h 
-        ON m.MAIN_BAND_NO = h.subb_band_no 
+        ON m.MAIN_BAND_NO = h.subbno
         AND h.company_id = m.company_id
       WHERE m.company_id = ? 
         AND (m.MAIN_NO LIKE ? OR m.MAIN_NAME LIKE ? OR h.subbname LIKE ?)
@@ -994,6 +1020,191 @@ app.get("/api/reports/balance-sheet", authMiddleware(), async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
+
+app.get('/account-statement', async (req, res) => {
+  const { sub_no, fdate, ldate } = req.query;
+
+  try {
+    const SYSYEAR = new Date().getFullYear();
+
+    const [result] = await pool.query(
+      `
+      SELECT
+          j.idauto,
+          j.journal_no,
+          j.journal_date,
+          j.journal_docno,
+          j.journal_dr,
+          j.journal_cr,
+          j.journal_desc,
+          sm.submain_name,
+
+          --  الرصيد الجاري (Running Balance)
+          (
+              SELECT
+                  SUM(COALESCE(j2.journal_dr, 0) - COALESCE(j2.journal_cr, 0))
+              FROM journal j2
+              WHERE
+                  j2.journal_submain_no = j.journal_submain_no
+                  AND (
+                      j2.journal_date < j.journal_date
+                      OR (j2.journal_date = j.journal_date AND j2.journal_no < j.journal_no)
+                      OR (j2.journal_date = j.journal_date AND j2.journal_no = j.journal_no AND j2.idauto <= j.idauto)
+                  )
+                  AND YEAR(j2.journal_date) = ?
+          ) AS running_balance,
+
+          --  إجمالي رصيد السنة كلها (Final balance)
+          (
+              SELECT
+                  SUM(COALESCE(j3.journal_dr, 0) - COALESCE(j3.journal_cr, 0))
+              FROM journal j3
+              WHERE
+                  j3.journal_submain_no = j.journal_submain_no
+                  AND YEAR(j3.journal_date) = ?
+          ) AS final_balance,
+
+          --  رصيد الفترة فقط (Period balance)
+          (
+              SELECT
+                  SUM(COALESCE(j4.journal_dr, 0) - COALESCE(j4.journal_cr, 0))
+              FROM journal j4
+              WHERE
+                  j4.journal_submain_no = j.journal_submain_no
+                  AND j4.journal_date BETWEEN ? AND ?
+          ) AS period_balance
+
+      FROM journal j
+      INNER JOIN submain sm ON j.journal_submain_no = sm.submain_no
+
+      WHERE
+          j.journal_submain_no = ?
+          AND YEAR(j.journal_date) = ?
+          AND j.journal_date BETWEEN ? AND ?
+
+      ORDER BY
+          j.journal_date,
+          j.journal_no,
+          j.idauto;
+      `,
+      [SYSYEAR, SYSYEAR, fdate, ldate, sub_no, SYSYEAR, fdate, ldate]
+    );
+
+    res.json(result);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'فشل في تحميل التقرير' });
+  }
+});
+
+
+
+// البحث عن الحسابات بالاسم
+app.get('/accounts1', async (req, res) => {
+  const { search } = req.query;
+
+  try {
+    const [rows] = await pool.query(
+      `SELECT submain_no AS sub_no, submain_name AS name 
+       FROM submain 
+       WHERE submain_name LIKE ? 
+       LIMIT 20`,
+      [`%${search}%`]
+    );
+    res.json(rows);
+  } catch (err) {
+    console.error('فشل في جلب الحسابات:', err);
+    res.status(500).json({ error: 'خطأ في الخادم أثناء جلب الحسابات' });
+  }
+});
+
+// تقرير ميزان المراجعة حسب المستوى
+app.get("/api/trial-balance", async (req, res) => {
+  try {
+    const { level, fromDate, toDate } = req.query;
+
+    let query = "";
+
+    switch (level) {
+      case "band":
+        query = `
+          SELECT 
+            B.BAND_NO AS ACCNO,
+            B.BAND_NAME AS ACCNAME,
+            SUM(IFNULL(J.JOURNAL_DR,0)) AS DEBIT,
+            SUM(IFNULL(J.JOURNAL_CR,0)) AS CREDIT
+          FROM JOURNAL J
+          INNER JOIN SUBMAIN SM ON J.JOURNAL_SUBMAIN_NO = SM.SUBMAIN_NO
+          INNER JOIN MAIN M ON SM.SUBMAIN_MAIN_NO = M.MAIN_NO
+          INNER JOIN SUBBAND SB ON M.MAIN_BAND_NO = SB.SUBBNO
+          INNER JOIN BAND B ON SB.SUBB_BAND_NO = B.BAND_NO
+          WHERE J.JOURNAL_DATE BETWEEN ? AND ?
+          GROUP BY B.BAND_NO, B.BAND_NAME
+          ORDER BY B.BAND_NO;
+        `;
+        break;
+
+      case "subband":
+        query = `
+          SELECT 
+            SB.SUBBNO AS ACCNO,
+            SB.SUBBNAME AS ACCNAME,
+            SUM(IFNULL(J.JOURNAL_DR,0)) AS DEBIT,
+            SUM(IFNULL(J.JOURNAL_CR,0)) AS CREDIT
+          FROM JOURNAL J
+          INNER JOIN SUBMAIN SM ON J.JOURNAL_SUBMAIN_NO = SM.SUBMAIN_NO
+          INNER JOIN MAIN M ON SM.SUBMAIN_MAIN_NO = M.MAIN_NO
+          INNER JOIN SUBBAND SB ON M.MAIN_BAND_NO = SB.SUBBNO
+          WHERE J.JOURNAL_DATE BETWEEN ? AND ?
+          GROUP BY SB.SUBBNO, SB.SUBBNAME
+          ORDER BY SB.SUBBNO;
+        `;
+        break;
+
+      case "main":
+        query = `
+          SELECT 
+            M.MAIN_NO AS ACCNO,
+            M.MAIN_NAME AS ACCNAME,
+            SUM(IFNULL(J.JOURNAL_DR,0)) AS DEBIT,
+            SUM(IFNULL(J.JOURNAL_CR,0)) AS CREDIT
+          FROM JOURNAL J
+          INNER JOIN SUBMAIN SM ON J.JOURNAL_SUBMAIN_NO = SM.SUBMAIN_NO
+          INNER JOIN MAIN M ON SM.SUBMAIN_MAIN_NO = M.MAIN_NO
+          WHERE J.JOURNAL_DATE BETWEEN ? AND ?
+          GROUP BY M.MAIN_NO, M.MAIN_NAME
+          ORDER BY M.MAIN_NO;
+        `;
+        break;
+
+      case "submain":
+        query = `
+          SELECT 
+            SM.SUBMAIN_NO AS ACCNO,
+            SM.SUBMAIN_NAME AS ACCNAME,
+            SUM(IFNULL(J.JOURNAL_DR,0)) AS DEBIT,
+            SUM(IFNULL(J.JOURNAL_CR,0)) AS CREDIT
+          FROM JOURNAL J
+          INNER JOIN SUBMAIN SM ON J.JOURNAL_SUBMAIN_NO = SM.SUBMAIN_NO
+          WHERE J.JOURNAL_DATE BETWEEN ? AND ?
+          GROUP BY SM.SUBMAIN_NO, SM.SUBMAIN_NAME
+          ORDER BY SM.SUBMAIN_NO;
+        `;
+        break;
+
+      default:
+        return res.status(400).json({ error: "Invalid level" });
+    }
+
+    const [rows] = await pool.execute(query, [fromDate, toDate]);
+    res.json(rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
 
 
 

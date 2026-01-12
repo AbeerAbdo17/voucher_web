@@ -95,3 +95,217 @@
   text-align: left;
 }
 
+.report-page {
+  max-width: 1000px;
+  width: 95%;
+  margin: 30px auto;
+  background: #fff;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(21, 63, 77, 0.2);
+  font-family: "Cairo", sans-serif;
+  box-sizing: border-box;
+}
+
+/* العنوان */
+.title {
+  text-align: center;
+  margin-bottom: 25px;
+  color: #153F4D;
+  font-weight: bold;
+  font-size: 24px;
+}
+
+/* عناصر التحكم */
+.controls {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 0.5fr;
+  gap: 20px;
+  align-items: end;
+  margin-bottom: 30px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.form-group label {
+  font-weight: bold;
+  margin-bottom: 6px;
+  color: #153F4D;
+  font-size: 14px;
+}
+
+/* مدخل التاريخ */
+.date-input {
+  width: 100%;
+  padding: 8px 10px;
+  font-size: 14px;
+  border: 1px solid #C8E2E1;
+  border-radius: 8px;
+  box-sizing: border-box;
+  background-color: #f8fafa;
+  transition: 0.3s;
+}
+
+.date-input:focus {
+  outline: none;
+  border-color: #153F4D;
+  background-color: #fff;
+  box-shadow: 0 0 5px rgba(21, 63, 77, 0.3);
+}
+
+/* تحسين مظهر تقويم react-datepicker */
+.react-datepicker {
+  font-family: "Cairo", sans-serif !important;
+  border: 1px solid #C8E2E1 !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15) !important;
+}
+
+.react-datepicker__header {
+  background-color: #153F4D !important;
+  color: #fff !important;
+  border-bottom: none !important;
+}
+
+.react-datepicker__day--selected,
+.react-datepicker__day--keyboard-selected {
+  background-color: #153F4D !important;
+  color: #fff !important;
+}
+
+.react-datepicker__day:hover {
+  background-color: #1F5869 !important;
+  color: #fff !important;
+}
+
+/* الأزرار */
+.primary-btn,
+.btn.save {
+  background: #153F4D;
+  color: #fff;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: "Cairo", sans-serif;
+  font-weight: bold;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+  /* width: 100%; */
+}
+
+.primary-btn:hover,
+.btn.save:hover {
+  background: #1F5869;
+}
+
+.export-btn {
+  background: #568f88;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: 0.3s ease;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+}
+
+.export-btn:hover {
+  background: #316963;
+}
+
+/* الجدول */
+.table-wrapper {
+  margin-top: 15px;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid #C8E2E1;
+}
+
+.report-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.report-table th,
+.report-table td {
+  border: 1px solid #C8E2E1;
+  padding: 8px;
+  text-align: center;
+}
+
+.report-table th {
+  background: #153F4D;
+  color: #fff;
+  font-weight: bold;
+}
+
+.report-table tr:nth-child(even) {
+  background: #f0f6f6;
+}
+
+/* المجموعات */
+.bg-gray-50 {
+  background-color: #f7fafa;
+}
+
+.mt-6 {
+  margin-top: 24px;
+}
+
+.text-center {
+  text-align: center;
+}
+
+/* Toast */
+.toast {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  padding: 12px 20px;
+  border-radius: 8px;
+  color: #fff;
+  font-weight: bold;
+  z-index: 9999;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+  animation: fadeInOut 3s forwards;
+}
+
+.toast.success {
+  background: #77C8BF;
+  color: #153F4D;
+}
+
+.toast.error {
+  background: #e74c3c;
+}
+
+@keyframes fadeInOut {
+  0% { opacity: 0; transform: translateY(-10px); }
+  10% { opacity: 1; transform: translateY(0); }
+  90% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-10px); }
+}
+
+/* موبايل */
+@media (max-width: 768px) {
+  .controls {
+    grid-template-columns: 1fr;
+  }
+
+  .report-table th,
+  .report-table td {
+    font-size: 13px;
+    padding: 5px;
+  }
+
+  .btn.save,
+  .primary-btn {
+    font-size: 14px;
+  }
+}

@@ -8,8 +8,7 @@ import {
   FaBoxes,
   FaGlobe,
   FaUsersCog,
-  FaChevronDown,
-  FaChevronUp,
+  FaChartBar,
 } from "react-icons/fa";
 import "./style/Sidebar.css";
 
@@ -18,16 +17,22 @@ function Sidebar({ lang, setLang, navigate }) {
   const [screens, setScreens] = useState([]);
   const [isAdmin, setIsAdmin] = useState(false);
   const [showReports, setShowReports] = useState(false);
+  const [permissions, setPermissions] = useState({});
 
   useEffect(() => {
     const role = localStorage.getItem("userRole");
     const allowedScreens = JSON.parse(localStorage.getItem("screens") || "[]");
+    const userPermissions = JSON.parse(localStorage.getItem("permissions") || "{}");
+
     setIsAdmin(role === "admin");
     setScreens(allowedScreens);
+    setPermissions(userPermissions);
   }, []);
 
   const availableReports = [
     { key: "balanceSheet", name: lang === "ar" ? "الميزانية العمومية" : "Balance Sheet" },
+    { key: "accountStatement", name: lang === "ar" ? "كشف حساب" : "Account Statement" },
+    { key: "trialbalance", name: lang === "ar" ? "ميزان المراجعة" : "Trial Balance" },
   ];
 
   const toggleLanguage = () => {
@@ -54,7 +59,7 @@ function Sidebar({ lang, setLang, navigate }) {
   const t = {
     ar: {
       journal: "قيد اليومية",
-      accounts: "الحسابات",
+      accounts: " الحسابات التشغيلية",
       highAccounts: "الحسابات الفرعية",
       highBands: "الحسابات العليا",
       users: "إدارة المستخدمين",
@@ -64,7 +69,7 @@ function Sidebar({ lang, setLang, navigate }) {
     },
     en: {
       journal: "Journal Entry",
-      accounts: "Accounts",
+      accounts: "Operating Accounts",
       highAccounts: "High Sub Accounts",
       highBands: "High Accounts",
       users: "Manage Users",
@@ -118,24 +123,28 @@ function Sidebar({ lang, setLang, navigate }) {
           </li>
         )}
 
+        {/* ✅ إظهار التقارير حسب الصلاحيات */}
         {screens.includes("Reports") && (
           <li
             className={`submenu ${showReports ? "active" : ""}`}
             onClick={() => setShowReports(!showReports)}
           >
             <div className="submenu-header">
-              <FaBook /> <span>{t.reports}</span>
+              <FaChartBar /> <span>{t.reports}</span>
             </div>
+
             {showReports && (
               <ul className="submenu-items">
-                {availableReports.map((r) => (
-                  <li
-                    key={r.key}
-                    onClick={() => handleNavigate(`/report/${r.key}`, "Reports")}
-                  >
-                    {r.name}
-                  </li>
-                ))}
+                {availableReports
+                  .filter((r) => permissions.Reports?.[r.name]) // ✅ فقط التقارير المسموح بها
+                  .map((r) => (
+                    <li
+                      key={r.key}
+                      onClick={() => handleNavigate(`/report/${r.key}`, "Reports")}
+                    >
+                      {r.name}
+                    </li>
+                  ))}
               </ul>
             )}
           </li>

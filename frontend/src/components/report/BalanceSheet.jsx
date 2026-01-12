@@ -34,7 +34,7 @@ const printPDF = () => {
   element.innerHTML = `
     <div style="font-family: 'Cairo', Arial, sans-serif; padding: 30px; color: #153F4D;">
       
-      <!-- الرأس (اللوجو + عنوان التقرير) بدون خط تحت الهيدر -->
+    
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; padding-bottom: 15px;">
         <div>
           <img src="${logoImg}" alt="Logo" style="height:80px; width:auto;" />
@@ -49,7 +49,7 @@ const printPDF = () => {
         
         <table style="width: 100%; border-collapse: collapse; margin-top: 20px; box-shadow: 0 0 6px rgba(0,0,0,0.1);">
           <thead>
-            <tr style="background-color: #e8f1f1;">
+            <tr style="background-color: #ffffffff;">
               <th style="border: 1px solid #153F4D; padding: 10px; font-size: 17px;">${t.subband}</th>
               <th style="border: 1px solid #153F4D; padding: 10px; text-align: end; font-size: 17px;">${t.total}</th>
             </tr>

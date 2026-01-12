@@ -9,6 +9,8 @@ import RegisterUser from "./components/RegisterUser";
 import RegisterCompany from "./components/RegisterCompany";
 import AdminUsers from "./components/AdminUsers";
 import BalanceSheet from "./components/report/BalanceSheet";
+import AccountStatement from "./components/report/AccountStatement";
+import TrialBalance from "./components/report/trialbalance";
 
 
 function App() {
@@ -63,6 +65,12 @@ const navigate = (path) => {
     case "/report/balanceSheet":
       setPage("balanceSheet");
       break;
+      case "/report/accountStatement":
+      setPage("accountStatement");
+      break;
+      case "/report/trialbalance":
+      setPage("trialbalance");
+      break;
     default:
       setPage("voucher");
   }
@@ -112,6 +120,8 @@ const navigate = (path) => {
         {page === "register-company" && <RegisterCompany navigate={navigate} />}
         {page === "register-user" && <RegisterUser navigate={navigate} />}
         {page === "balanceSheet" && <BalanceSheet lang={lang} />}
+        {page === "accountStatement" && <AccountStatement lang={lang} />}
+        {page === "trialbalance" && <TrialBalance lang={lang} />}
 
         {/* {page === "admin-users" && <AdminUsers lang={lang} />} */}
       </div>

@@ -1,0 +1,388 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="trbalancerep" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="29af79a1-9944-431e-8fa4-34adb95d0ff1">
+	<property name="ireport.zoom" value="2.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="com_name" class="java.lang.String"/>
+	<parameter name="com_loc" class="java.lang.String"/>
+	<parameter name="com_tel" class="java.lang.String"/>
+	<parameter name="com_email" class="java.lang.String"/>
+	<parameter name="user" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="TO_DATE" class="java.util.Date"/>
+	<parameter name="FROM_DATE" class="java.util.Date"/>
+	<parameter name="SYSYEAR" class="java.lang.Integer"/>
+	<queryString>
+		<![CDATA[SELECT
+B.BAND_NAME AS BAND_ACCNAME,
+B.BAND_NO AS BAND_ACCNO,
+SB.SUBBNAME AS ACCNAME,
+SB.SUBBNO AS ACCNO,
+
+-- DEBIT: If net (CR - DR) is negative
+CASE
+WHEN SUM(J.journal_CR - J.journal_DR) < 0 THEN
+ABS(SUM(J.journal_CR - J.journal_DR))
+ELSE 0
+END AS DEBIT,
+
+-- CREDIT: If net (CR - DR) is positive
+CASE
+WHEN SUM(J.journal_CR - J.journal_DR) > 0 THEN
+SUM(J.journal_CR - J.journal_DR)
+ELSE 0
+END AS CREDIT
+
+FROM JOURNAL J
+INNER JOIN SUBMAIN SM ON J.JOURNAL_submain_no = SM.SUBMAIN_NO
+INNER JOIN MAIN M ON SM.SUBMAIN_MAIN_NO = M.MAIN_NO
+INNER JOIN SUBBAND SB ON M.MAIN_band_NO = SB.SUBBNO
+INNER JOIN BAND B ON SB.SUBB_BAND_NO = B.BAND_NO
+
+-- ✅ Filter by system year and date range
+WHERE YEAR(J.journal_date) = $P{SYSYEAR}
+  AND J.journal_date BETWEEN $P{FROM_DATE} AND $P{TO_DATE}
+
+GROUP BY
+B.BAND_NAME,
+B.BAND_NO,
+SB.SUBBNAME,
+SB.SUBBNO]]>
+	</queryString>
+	<field name="BAND_ACCNAME" class="java.lang.String"/>
+	<field name="BAND_ACCNO" class="java.math.BigDecimal"/>
+	<field name="ACCNAME" class="java.lang.String"/>
+	<field name="ACCNO" class="java.lang.Integer"/>
+	<field name="DEBIT" class="java.lang.Double">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="CREDIT" class="java.lang.Double">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<variable name="sumdebit" class="java.lang.Number" calculation="Sum">
+		<variableExpression><![CDATA[$F{DEBIT}]]></variableExpression>
+	</variable>
+	<variable name="sumcredit" class="java.lang.Number" calculation="Sum">
+		<variableExpression><![CDATA[$F{CREDIT}]]></variableExpression>
+		<initialValueExpression><![CDATA[]]></initialValueExpression>
+	</variable>
+	<variable name="variable1" class="java.lang.Double" calculation="Sum">
+		<variableExpression><![CDATA[$F{CREDIT}]]></variableExpression>
+	</variable>
+	<variable name="sumdum" class="java.lang.Float" calculation="Sum">
+		<variableExpression><![CDATA[$F{DEBIT}]]></variableExpression>
+	</variable>
+	<variable name="DEBIT_1" class="java.lang.Double" resetType="Group" resetGroup="acc_main_group" calculation="Sum">
+		<variableExpression><![CDATA[$F{DEBIT}]]></variableExpression>
+	</variable>
+	<variable name="CREDIT_1" class="java.lang.Double" resetType="Group" resetGroup="acc_main_group" calculation="Sum">
+		<variableExpression><![CDATA[$F{CREDIT}]]></variableExpression>
+	</variable>
+	<group name="acc_main_group">
+		<groupExpression><![CDATA[$F{MAIN_ACCNAME}]]></groupExpression>
+		<groupHeader>
+			<band height="53">
+				<textField>
+					<reportElement uuid="6759370a-634d-4129-8436-b4f7ed74bb18" x="98" y="11" width="325" height="20"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial" size="12" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{MAIN_ACCNAME}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement uuid="4e3dc83c-0c9f-401e-bd3c-739a52a046c4" x="3" y="11" width="95" height="20"/>
+					<textElement verticalAlignment="Middle">
+						<font size="12" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Main Account :]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="93a39d37-e992-4f6f-ba89-8bfd502120ff" x="130" y="33" width="159" height="20"/>
+					<box>
+						<pen lineWidth="1.25"/>
+						<topPen lineWidth="1.25"/>
+						<leftPen lineWidth="1.25"/>
+						<bottomPen lineWidth="1.25"/>
+						<rightPen lineWidth="1.25"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Arial" size="12" isBold="true"/>
+					</textElement>
+					<text><![CDATA[ACCOUNT NAME]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="7d8096f8-dfc7-4770-a5f9-ccb99e2aed65" x="289" y="33" width="134" height="20"/>
+					<box>
+						<pen lineWidth="1.25"/>
+						<topPen lineWidth="1.25"/>
+						<leftPen lineWidth="1.25"/>
+						<bottomPen lineWidth="1.25"/>
+						<rightPen lineWidth="1.25"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Arial" size="12" isBold="true"/>
+					</textElement>
+					<text><![CDATA[DEBIT]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="61ccab69-1348-4df5-8687-6e330db00566" x="423" y="33" width="127" height="20"/>
+					<box>
+						<pen lineWidth="1.25"/>
+						<topPen lineWidth="1.25"/>
+						<leftPen lineWidth="1.25"/>
+						<bottomPen lineWidth="1.25"/>
+						<rightPen lineWidth="1.25"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Arial" size="12" isBold="true"/>
+					</textElement>
+					<text><![CDATA[CREDIT]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="403555bf-79f2-426d-97da-54728f2385a9" x="3" y="33" width="127" height="20"/>
+					<box>
+						<pen lineWidth="1.25"/>
+						<topPen lineWidth="1.25"/>
+						<leftPen lineWidth="1.25"/>
+						<bottomPen lineWidth="1.25"/>
+						<rightPen lineWidth="1.25"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="Arial" size="12" isBold="true"/>
+					</textElement>
+					<text><![CDATA[ACCOUNT NO]]></text>
+				</staticText>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="23">
+				<textField pattern="#,##0.00">
+					<reportElement uuid="203370b4-a3c7-45bd-b439-baf2906a7427" mode="Opaque" x="289" y="0" width="134" height="20" forecolor="#000000" backcolor="#CCCCCC"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<textFieldExpression><![CDATA[$V{DEBIT_1}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00">
+					<reportElement uuid="63bfe285-565a-4c53-8422-a0abaaf9f162" mode="Opaque" x="423" y="0" width="127" height="20" forecolor="#000000" backcolor="#CCCCCC"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<textFieldExpression><![CDATA[$V{CREDIT_1}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement uuid="cdc29a38-256b-48eb-bbd5-eea85b261e13" mode="Opaque" x="1" y="0" width="288" height="20" backcolor="#CCCCCC"/>
+					<textElement verticalAlignment="Middle"/>
+					<text><![CDATA[   Main Account Total]]></text>
+				</staticText>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="179" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="075f3ec0-cb3a-4dbc-b12b-2d438da5a6e4" x="184" y="109" width="200" height="26"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[TRIAL BALANCE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="96034867-5e81-4a1f-84d7-c6444f64f81c" x="384" y="135" width="66" height="20"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Print Date]]></text>
+			</staticText>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement uuid="da080eb1-4d8d-4815-8f05-b94ed7dcbb22" x="457" y="135" width="92" height="20"/>
+				<textElement verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<image scaleImage="FillFrame">
+				<reportElement uuid="3197fc39-7ee5-4f57-9eac-ed65b9a36541" x="4" y="4" width="546" height="102"/>
+				<box>
+					<pen lineWidth="2.0"/>
+					<topPen lineWidth="2.0"/>
+					<leftPen lineWidth="2.0"/>
+					<bottomPen lineWidth="2.0"/>
+					<rightPen lineWidth="2.0"/>
+				</box>
+				<imageExpression><![CDATA["header.jpg"]]></imageExpression>
+			</image>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="16e02128-9938-4de5-95d2-c3caca038a49" x="130" y="78" width="120" height="0"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{com_loc}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="98d38719-962c-41bd-80aa-f99bcfe7e50e" x="191" y="156" width="33" height="20"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial"/>
+				</textElement>
+				<text><![CDATA[From]]></text>
+			</staticText>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement uuid="3603a87e-2364-4664-a562-91af66a05b5f" x="231" y="156" width="56" height="20"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{FROM_DATE}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="6562382f-3749-4257-9c3b-b682ee6feef8" x="287" y="156" width="22" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial"/>
+				</textElement>
+				<text><![CDATA[To]]></text>
+			</staticText>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement uuid="aff597ba-315c-41ed-aa58-0cff65409814" x="314" y="156" width="100" height="20"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$P{TO_DATE}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="4" splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="5" splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="20" splitType="Stretch">
+			<textField>
+				<reportElement uuid="f3daff18-704d-4bfd-95fa-fc743f9215d8" x="130" y="0" width="159" height="20"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" pdfEncoding="Cp1256"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ACCNAME}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="#,##0.00">
+				<reportElement uuid="357af95f-41be-48f3-9a76-c5e786d1b21b" x="289" y="0" width="134" height="20"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DEBIT}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="#,##0.00">
+				<reportElement uuid="3e6e84ff-e597-42d4-8bff-2bab6078a5d5" x="423" y="0" width="127" height="20"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CREDIT}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement uuid="b15a7fd2-18dd-4285-940d-d4c24c9246d9" x="1" y="0" width="461" height="1"/>
+			</line>
+			<textField isStretchWithOverflow="true">
+				<reportElement uuid="cac28359-474d-421c-a260-53fe26064be6" x="3" y="0" width="127" height="20"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ACCNO}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="28" splitType="Stretch">
+			<line>
+				<reportElement uuid="7c42c60f-3cdf-466b-b8ae-2133dc1e3471" x="3" y="1" width="547" height="2"/>
+			</line>
+			<line>
+				<reportElement uuid="86af2aba-e343-4620-9e26-5d2c0cab4bf0" x="3" y="0" width="547" height="1"/>
+			</line>
+			<textField>
+				<reportElement uuid="651a9e78-7e5c-4108-9e07-823ef58b039e" x="429" y="5" width="80" height="20"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement uuid="2d4d6799-632e-4e35-b7ea-fe43083ce5e8" x="509" y="5" width="40" height="20"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="31" splitType="Stretch">
+			<textField pattern="#,##0.00">
+				<reportElement uuid="87698abc-4f22-4b30-b674-559af549a49a" mode="Opaque" x="289" y="3" width="134" height="20" backcolor="#CCCCCC"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{sumdebit}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement uuid="810a1a39-1091-477e-aca9-7204e7d4a764" mode="Opaque" x="423" y="3" width="127" height="20" backcolor="#CCCCCC"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{sumcredit}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="5bba5058-e954-4228-b657-0ff8b9b71c08" mode="Opaque" x="3" y="3" width="286" height="20" backcolor="#CCCCCC"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[  TOTAL]]></text>
+			</staticText>
+		</band>
+	</summary>
+</jasperReport>

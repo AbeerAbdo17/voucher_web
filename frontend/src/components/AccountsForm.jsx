@@ -128,8 +128,11 @@ function AccountsForm({ lang, permissions }) {
   }
 
   return (
-    <div className="account-container">
-      <h2>{lang === "ar" ? "الحسابات" : "Accounts"}</h2>
+    <div className="account-container"
+     dir={lang === "ar" ? "rtl" : "ltr"}
+     style={{ textAlign: lang === "ar" ? "right" : "left" }}
+    >
+      <h2>{lang === "ar" ? "الحسابات التشغلية" : "OPerating Accounts"}</h2>
 
       {canEdit && (
         <form onSubmit={handleSubmit} className="account-form">

@@ -86,7 +86,7 @@ function HighAccountsForm({ lang, permissions }) {
                   MAIN_NAME: mainName,
                   MAIN_BAND_NO: mainBandNo,
                   high_account_name:
-                    highAccounts.find((h) => h.subb_band_no === mainBandNo)?.subbname || "",
+                    highAccounts.find((h) => h.subbno === mainBandNo)?.subbname || "",
                 }
               : acc
           )
@@ -101,7 +101,7 @@ function HighAccountsForm({ lang, permissions }) {
         });
 
         const highName =
-          highAccounts.find((h) => h.subb_band_no === mainBandNo)?.subbname || "";
+          highAccounts.find((h) => h.subbno === mainBandNo)?.subbname || "";
         setSubAccounts((prev) => [
           ...prev,
           {
@@ -150,8 +150,11 @@ function HighAccountsForm({ lang, permissions }) {
   }
 
   return (
-    <div className="account-container">
-      <h2>{lang === "ar" ? "الحسابات الفرعية العليا" : "High Sub Accounts"}</h2>
+    <div className="account-container"
+     dir={lang === "ar" ? "rtl" : "ltr"}
+     style={{ textAlign: lang === "ar" ? "right" : "left" }} 
+    >
+      <h2>{lang === "ar" ? "الحسابات الفرعية " : "High Sub Accounts"}</h2>
 
       {/* 🧾 النموذج - يظهر فقط لو عندك صلاحية تعديل */}
       {canEdit && (
@@ -167,7 +170,7 @@ function HighAccountsForm({ lang, permissions }) {
                 {lang === "ar" ? "اختر الحساب" : "Select High Account"}
               </option>
               {highAccounts.map((acc) => (
-                <option key={acc.ID} value={acc.subb_band_no}>
+                <option key={acc.ID} value={acc.subbno}>
                   {acc.subbname}
                 </option>
               ))}

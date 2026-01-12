@@ -168,7 +168,10 @@ function HighBandsForm({ lang, permissions }) {
   }
 
   return (
-    <div className="account-container">
+    <div className="account-container"
+     dir={lang === "ar" ? "rtl" : "ltr"}
+     style={{ textAlign: lang === "ar" ? "right" : "left" }}
+    >
       <h2>{lang === "ar" ? "الحسابات العليا" : "High Bands"}</h2>
 
       {/* 🧾 النموذج يظهر فقط لو عندك صلاحية تعديل */}
